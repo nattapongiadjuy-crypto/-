@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ภารกิจนักท่องเน็ตอัจฉริยะ | ชุดที่ 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1B2A;
+    --bg-2: #14273D;
+    --panel: #1B3049;
+    --panel-2: #223B57;
+    --line: #33526E;
+    --text: #EAF2F8;
+    --text-dim: #9FB8CC;
+    --browser: #4FA3E3; --browser-dim: #29406B;
+    --advanced: #5FE0D0; --advanced-dim: #1F4A48;
+    --ai: #C97BF0; --ai-dim: #4A3468;
+    --safety: #F2607B; --safety-dim: #5B2C38;
+    --wrong: #EF6161;
+    --gold: #FFC857;
+    --easy: #2FBF71;
+    --medium: #F2C94C;
+    --hard: #EF6161;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(circle at 50% 0%, var(--bg-2), var(--bg) 55%);
+    color: var(--text); font-family:'Sarabun', sans-serif;
+    min-height:100vh; padding: 28px 16px 60px;
+  }
+  h1,h2,h3, .display{ font-family:'Kanit', sans-serif; }
+  .wrap{ max-width: 880px; margin: 0 auto; }
+
+  .circuit-bg{
+    position: fixed; inset:0; z-index:-1; opacity:0.28;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 6%, black 0%, transparent 65%);
+  }
+
+  .brand{ display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
+  .brand .tag{
+    font-family:'Kanit'; font-size:12px; letter-spacing:.14em; color: var(--gold);
+    border:1px solid rgba(255,200,87,.4); padding:4px 10px; border-radius:999px; text-transform:uppercase;
+  }
+  .brand .line{ flex:1; height:1px; background: var(--line); }
+
+  .hero{
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line); border-radius: 20px; padding: 34px 30px;
+  }
+  .hero h1{ font-size: clamp(26px,5vw,38px); margin:0 0 10px; font-weight:800; line-height:1.2; }
+  .hero p.sub{ color:var(--text-dim); font-size:16px; margin:0 0 20px; max-width:64ch; }
+
+  .flow-signature{ display:flex; align-items:center; gap:6px; margin: 20px 0 20px; flex-wrap:wrap; }
+  .flow-node{ font-family:'Kanit'; font-size:12.5px; font-weight:600; padding:7px 13px; border-radius:8px; white-space:nowrap; border:1px solid transparent; }
+  .flow-node.n-browser{ background: var(--browser-dim); color:#A9D2F5; border-color:#3E5F93;}
+  .flow-node.n-advanced{ background: var(--advanced-dim); color:#A8F0E6; border-color:#3D7A72;}
+  .flow-node.n-ai{ background: var(--ai-dim); color:#E0B6FA; border-color:#6B4B95;}
+  .flow-node.n-safety{ background: var(--safety-dim); color:#F8B3C0; border-color:#8C4457;}
+  .flow-arrow{ color: var(--text-dim); font-size:14px; }
+
+  .topic-chips{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+  .chip{ font-size:13px; font-family:'Kanit'; padding:6px 12px; border-radius:999px; border:1px solid var(--line); color:var(--text-dim); }
+
+  .diff-legend{ display:flex; gap:14px; flex-wrap:wrap; margin-bottom:22px; font-size:12.5px; font-family:'Kanit'; }
+  .diff-legend span{ display:flex; align-items:center; gap:6px; color:var(--text-dim); }
+  .diff-dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+  .start-btn{
+    appearance:none; border:none; cursor:pointer;
+    background: linear-gradient(135deg, var(--gold), #E8A93A);
+    color:#241B00; font-family:'Kanit'; font-weight:700; font-size:17px;
+    padding:15px 30px; border-radius:12px; box-shadow: 0 10px 24px -8px rgba(255,200,87,.5);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .start-btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px -8px rgba(255,200,87,.65); }
+  .start-btn:active{ transform: translateY(0px) scale(.98); }
+
+  .meta-row{ display:flex; gap:18px; margin-top:22px; flex-wrap:wrap; }
+  .meta-item{ font-size:13px; color:var(--text-dim); }
+  .meta-item b{ color:var(--text); font-family:'Kanit'; }
+
+  .hidden{ display:none !important; }
+
+  .progress-path{ display:flex; gap:2.5px; margin: 4px 0 22px; flex-wrap:wrap; }
+  .progress-path .node{ width: 11px; height:11px; border-radius:3px; background: var(--panel-2); border:1px solid var(--line); transition: background .2s ease, transform .15s ease; }
+  .progress-path .node.current{ transform: scale(1.35); border-color: var(--gold); }
+  .progress-path .node.done-correct{ background: var(--easy); border-color:var(--easy); }
+  .progress-path .node.done-wrong{ background: var(--wrong); border-color:var(--wrong); }
+
+  .top-info{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  .q-counter{ font-family:'Kanit'; font-weight:600; font-size:15px; color:var(--text-dim);}
+  .q-counter b{ color:var(--text); }
+  .score-badge{ font-family:'Kanit'; font-weight:700; font-size:14px; background: var(--panel-2); border:1px solid var(--line); padding:6px 14px; border-radius:999px; }
+
+  .pill-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .category-pill{ display:inline-block; font-family:'Kanit'; font-size:12px; font-weight:600; padding:5px 12px; border-radius:999px; letter-spacing:.02em; }
+  .cat-browser{ background: var(--browser-dim); color:#A9D2F5; }
+  .cat-advanced{ background: var(--advanced-dim); color:#A8F0E6; }
+  .cat-ai{ background: var(--ai-dim); color:#E0B6FA; }
+  .cat-safety{ background: var(--safety-dim); color:#F8B3C0; }
+  .level-pill{ display:inline-flex; align-items:center; gap:5px; font-family:'Kanit'; font-size:12px; font-weight:600; padding:5px 12px; border-radius:999px; background: var(--panel-2); color:var(--text-dim); }
+  .level-pill .dot{ width:7px; height:7px; border-radius:50%; }
+
+  .q-card{ background: linear-gradient(160deg, var(--panel), #16283C); border:1px solid var(--line); border-radius:18px; padding: 26px 24px 22px; }
+  .q-text{ font-size: 18px; line-height:1.75; margin:0 0 20px; font-weight:500; white-space: pre-line; }
+
+  .choices{ display:flex; flex-direction:column; gap:10px; }
+  .choice-btn{
+    text-align:left; width:100%; background: var(--panel-2); border:1.5px solid var(--line);
+    color: var(--text); font-family:'Sarabun'; font-size:15.5px; line-height:1.5;
+    padding: 13px 16px; border-radius:12px; cursor:pointer;
+    display:flex; gap:12px; align-items:flex-start;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .choice-btn .letter{
+    font-family:'Kanit'; font-weight:700; font-size:13px; width:24px; height:24px; min-width:24px; border-radius:7px;
+    background: var(--bg); display:flex; align-items:center; justify-content:center; color: var(--text-dim); margin-top:1px;
+  }
+  .choice-btn:hover:not(:disabled){ border-color: var(--gold); transform: translateX(2px); }
+  .choice-btn:disabled{ cursor:default; }
+  .choice-btn.correct{ border-color: var(--easy); background: #1F4A38; }
+  .choice-btn.correct .letter{ background: var(--easy); color:#0A2117; }
+  .choice-btn.wrong{ border-color: var(--wrong); background: #3A2430; }
+  .choice-btn.wrong .letter{ background: var(--wrong); color:#2B0A0A; }
+
+  .feedback{ margin-top:18px; font-family:'Kanit'; font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:8px; }
+  .feedback.ok{ color:#8DE8B4; }
+  .feedback.no{ color:#F5A3A3; }
+
+  .nav-row{ display:flex; justify-content:flex-end; margin-top:20px; }
+  .next-btn{
+    appearance:none; border:none; cursor:pointer; background: var(--gold); color:#241B00; font-family:'Kanit'; font-weight:700; font-size:15px;
+    padding:11px 24px; border-radius:10px; opacity:0; pointer-events:none; transition: opacity .2s ease, transform .15s ease;
+  }
+  .next-btn.show{ opacity:1; pointer-events:auto; }
+  .next-btn:hover{ transform: translateY(-1px); }
+  .next-btn:disabled{ opacity:.5 !important; pointer-events:none !important; cursor:default; }
+
+  .result-hero{ text-align:center; padding: 40px 24px; background: linear-gradient(160deg, var(--panel), var(--panel-2)); border:1px solid var(--line); border-radius:20px; }
+  .result-score{ font-family:'Kanit'; font-weight:800; font-size:56px; margin: 10px 0 4px; }
+  .result-score span{ font-size:28px; color: var(--text-dim); font-weight:600; }
+  .result-label{ font-family:'Kanit'; font-size:18px; color: var(--gold); font-weight:700; }
+  .result-sub{ color: var(--text-dim); margin-top:8px; font-size:14.5px; }
+
+  .breakdown{ display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-top:26px; }
+  .bd-card{ background: var(--bg-2); border:1px solid var(--line); border-radius:14px; padding:16px; text-align:left; }
+  .bd-card .bd-title{ font-family:'Kanit'; font-size:12.5px; font-weight:600; margin-bottom:8px; }
+  .bd-card .bd-num{ font-family:'Kanit'; font-size:24px; font-weight:800; }
+  .bd-card .bd-bar{ height:6px; border-radius:99px; background: var(--panel-2); margin-top:10px; overflow:hidden; }
+  .bd-card .bd-bar > div{ height:100%; border-radius:99px; }
+
+  .review-list{ margin-top: 30px; display:flex; flex-direction:column; gap:12px; }
+  .review-item{ background: var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .review-item .rq{ font-size:14.5px; line-height:1.65; margin-bottom:10px; white-space: pre-line; }
+  .review-item .ra{ font-size:13.5px; font-family:'Kanit'; }
+  .review-item .ra.ok{ color:#8DE8B4; }
+  .review-item .ra.no{ color:#F5A3A3; }
+  .review-item .ra .given{ display:block; margin-top:2px; color:var(--text-dim); font-family:'Sarabun'; }
+
+  .action-row{ display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
+  .ghost-btn{
+    appearance:none; cursor:pointer; font-family:'Kanit'; font-weight:600; font-size:14.5px;
+    background:transparent; border:1.5px solid var(--line); color:var(--text); padding:11px 22px; border-radius:10px;
+  }
+  .ghost-btn:hover{ border-color: var(--gold); color: var(--gold); }
+
+  footer.credit{ text-align:center; color:var(--text-dim); font-size:12.5px; margin-top:34px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="circuit-bg"></div>
+<div class="wrap">
+
+  <!-- ============ START SCREEN ============ -->
+  <div id="start-screen">
+    <div class="brand">
+      <span class="tag">วิทยาการคำนวณ · ป.6 · ชุดที่ 3</span>
+      <div class="line"></div>
+    </div>
+
+    <div class="hero">
+      <h1>ภารกิจนักท่องเน็ตอัจฉริยะ<br>ชุดที่ 3</h1>
+      <p class="sub">แบบทดสอบ 40 ข้อ ครอบคลุมหัวข้อ "การใช้อินเทอร์เน็ตค้นหาข้อมูลอย่างมีประสิทธิภาพ" และ "เทคโนโลยีสารสนเทศและความปลอดภัย" ตั้งแต่การใช้เว็บเบราว์เซอร์ เทคนิคการค้นหาขั้นสูง ความรู้พื้นฐานเรื่องปัญญาประดิษฐ์ (AI) ไปจนถึงความปลอดภัยและมารยาทในการใช้อินเทอร์เน็ต</p>
+
+      <div class="flow-signature">
+        <span class="flow-node n-browser">🔍 เบราว์เซอร์และการค้นหา</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node n-advanced">🎯 เทคนิคการค้นหาขั้นสูง</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node n-ai">🤖 AI และเทคโนโลยี</span>
+        <span class="flow-arrow">→</span>
+        <span class="flow-node n-safety">🛡️ ความปลอดภัยและมารยาท</span>
+      </div>
+
+      <div class="diff-legend">
+        <span><span class="diff-dot" style="background:var(--easy)"></span>ระดับง่าย</span>
+        <span><span class="diff-dot" style="background:var(--medium)"></span>ระดับปานกลาง</span>
+        <span><span class="diff-dot" style="background:var(--hard)"></span>ระดับยาก</span>
+      </div>
+
+      <div class="topic-chips">
+        <span class="chip">40 ข้อ</span>
+        <span class="chip">4 ตัวเลือกต่อข้อ</span>
+        <span class="chip">4 หมวด หมวดละ 10 ข้อ</span>
+        <span class="chip">สุ่มตำแหน่งคำตอบทุกครั้ง</span>
+        <span class="chip">ป้องกันปุ่มข้ามข้อแล้ว</span>
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">เริ่มทำข้อสอบ</button>
+
+      <div class="meta-row">
+        <div class="meta-item"><b>10 ข้อ</b> · เบราว์เซอร์และเครื่องมือค้นหา</div>
+        <div class="meta-item"><b>10 ข้อ</b> · เทคนิคการค้นหาขั้นสูง</div>
+        <div class="meta-item"><b>10 ข้อ</b> · AI และเทคโนโลยี</div>
+        <div class="meta-item"><b>10 ข้อ</b> · ความปลอดภัยและมารยาท</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ QUIZ SCREEN ============ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="top-info">
+      <div class="q-counter">ข้อที่ <b id="q-index">1</b> / 40</div>
+      <div class="score-badge">ตอบถูก <span id="score-live">0</span> ข้อ</div>
+    </div>
+    <div class="progress-path" id="progress-path"></div>
+
+    <div class="q-card">
+      <div class="pill-row">
+        <span class="category-pill" id="cat-pill">เบราว์เซอร์</span>
+        <span class="level-pill" id="level-pill"><span class="dot"></span><span class="level-text"></span></span>
+      </div>
+      <p class="q-text" id="q-text"></p>
+      <div class="choices" id="choices"></div>
+      <div class="feedback hidden" id="feedback"></div>
+      <div class="nav-row">
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">ข้อถัดไป →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <div id="result-screen" class="hidden">
+    <div class="result-hero">
+      <div class="result-label" id="result-label">เก่งมาก!</div>
+      <div class="result-score"><span id="final-score">0</span><span>/40</span></div>
+      <div class="result-sub" id="result-sub"></div>
+      <div class="breakdown" id="breakdown"></div>
+    </div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="action-row">
+      <button class="start-btn" onclick="restartQuiz()">ทำใหม่อีกครั้ง</button>
+      <button class="ghost-btn" onclick="scrollToTop()">กลับขึ้นด้านบน</button>
+    </div>
+  </div>
+
+  <footer class="credit">ภารกิจนักท่องเน็ตอัจฉริยะ · ชุดที่ 3 · วิทยาการคำนวณ ป.6</footer>
+</div>
+
+<script>
+const CAT = {
+  browser:  { label: "เบราว์เซอร์และเครื่องมือค้นหา", pill: "cat-browser" },
+  advanced: { label: "เทคนิคการค้นหาขั้นสูง", pill: "cat-advanced" },
+  ai:       { label: "AI และเทคโนโลยี", pill: "cat-ai" },
+  safety:   { label: "ความปลอดภัยและมารยาท", pill: "cat-safety" },
+};
+
+const LEVEL = {
+  easy:   { label: "ระดับง่าย",     color: "var(--easy)" },
+  medium: { label: "ระดับปานกลาง", color: "var(--medium)" },
+  hard:   { label: "ระดับยาก",     color: "var(--hard)" },
+};
+
+const quizData = [
+/* ============ เบราว์เซอร์และเครื่องมือค้นหา (10 ข้อ) ============ */
+{cat:"browser", lvl:"easy", q:"ข้อใดคือหน้าที่หลักของเว็บเบราว์เซอร์ (Web Browser)?",
+ c:["ใช้เปิดดูและเข้าถึงเว็บไซต์ต่าง ๆ บนอินเทอร์เน็ต","ใช้พิมพ์เอกสารรายงาน","ใช้ตัดต่อวิดีโอ","ใช้เล่นเกมออฟไลน์"], a:0},
+
+{cat:"browser", lvl:"easy", q:"โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?",
+ c:["Microsoft Word","Google Chrome","Mozilla Firefox","Safari"], a:0},
+
+{cat:"browser", lvl:"easy", q:"เครื่องมือค้นหา (Search Engine) มีหน้าที่หลักคืออะไร?",
+ c:["ช่วยค้นหาข้อมูลหรือเว็บไซต์ที่ต้องการจากคำค้นที่พิมพ์เข้าไป","ใช้เก็บรหัสผ่านทั้งหมดของผู้ใช้","ใช้สแกนไวรัสในเครื่องคอมพิวเตอร์","ใช้พิมพ์และแก้ไขเอกสาร"], a:0},
+
+{cat:"browser", lvl:"easy", q:"ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?",
+ c:["Google","Microsoft Word","Adobe Photoshop","Windows Media Player"], a:0},
+
+{cat:"browser", lvl:"medium", q:"\"แถบที่อยู่\" หรือ Address Bar ในเว็บเบราว์เซอร์ใช้สำหรับทำอะไร?",
+ c:["พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชม","แสดงจำนวนแท็บที่เปิดอยู่ทั้งหมด","ใช้ดาวน์โหลดไฟล์โดยตรง","ใช้เปลี่ยนธีมสีของเบราว์เซอร์"], a:0},
+
+{cat:"browser", lvl:"medium", q:"เว็บไซต์ที่มีนามสกุลโดเมน \".ac.th\" มักหมายถึงเว็บไซต์ประเภทใด?",
+ c:["สถาบันการศึกษาในประเทศไทย","หน่วยงานราชการไทย","องค์กรไม่แสวงหากำไร","บริษัทธุรกิจทั่วไป"], a:0},
+
+{cat:"browser", lvl:"medium", q:"ถ้าต้องการบันทึกเว็บไซต์ที่ชอบไว้เพื่อกลับมาดูภายหลังโดยไม่ต้องพิมพ์ค้นหาใหม่ ควรใช้ฟีเจอร์ใดของเบราว์เซอร์?",
+ c:["บุ๊กมาร์ก (Bookmark)","ประวัติการค้นหา (History)","โหมดไม่ระบุตัวตน (Incognito)","ตัวจัดการดาวน์โหลด"], a:0},
+
+{cat:"browser", lvl:"medium", q:"เมื่อค้นหาข้อมูลแล้วพบผลลัพธ์จำนวนมาก วิธีใดช่วยให้เลือกเว็บไซต์ที่น่าเชื่อถือได้ดีที่สุด?",
+ c:["อ่านชื่อเว็บไซต์ คำอธิบายสั้น ๆ และพิจารณาแหล่งที่มาก่อนคลิกเข้าไป","คลิกผลลัพธ์แรกสุดเสมอโดยไม่ต้องอ่านอะไร","เลือกเว็บไซต์ที่มีโฆษณาเยอะที่สุด","เลือกเว็บไซต์ที่ชื่อยาวที่สุด"], a:0},
+
+{cat:"browser", lvl:"hard", q:"ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่างเว็บเบราว์เซอร์กับเครื่องมือค้นหา?",
+ c:["เบราว์เซอร์คือโปรแกรมที่ใช้เปิดเว็บไซต์ ส่วนเครื่องมือค้นหาคือเว็บไซต์หนึ่งที่ช่วยหาข้อมูล ซึ่งต้องเปิดผ่านเบราว์เซอร์อีกที","ทั้งสองอย่างเป็นสิ่งเดียวกันใช้แทนกันได้เสมอ","เครื่องมือค้นหาต้องติดตั้งลงเครื่องคอมพิวเตอร์ก่อนใช้งาน","เบราว์เซอร์ใช้ได้เฉพาะบนโทรศัพท์มือถือเท่านั้น"], a:0},
+
+{cat:"browser", lvl:"hard", q:"การเปิดใช้งาน \"โหมดไม่ระบุตัวตน\" (Incognito/Private Mode) ในเบราว์เซอร์มีประโยชน์อย่างไร?",
+ c:["เบราว์เซอร์จะไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น","ทำให้อินเทอร์เน็ตเร็วขึ้นกว่าปกติ","ป้องกันไวรัสเข้าเครื่องคอมพิวเตอร์ทั้งหมด","ทำให้ไม่มีใครในโลกสามารถเห็นการใช้งานได้เลย"], a:0},
+
+/* ============ เทคนิคการค้นหาขั้นสูง (10 ข้อ) ============ */
+{cat:"advanced", lvl:"easy", q:"ถ้าต้องการค้นหาคำว่า \"ช้างไทย\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?",
+ c:["\"ช้างไทย\" (ใส่เครื่องหมายคำพูดครอบ)","ช้าง+ไทย","ช้าง OR ไทย","ช้าง -ไทย"], a:0},
+
+{cat:"advanced", lvl:"easy", q:"เครื่องหมายคำพูด (\" \") ในการค้นหา มีประโยชน์อย่างไร?",
+ c:["ทำให้ค้นหาคำหรือวลีตรงตัวตามที่พิมพ์ไว้พอดี ไม่แยกคำ","ทำให้ผลการค้นหาปรากฏเป็นภาพเท่านั้น","ทำให้ค้นหาได้เร็วขึ้นสองเท่า","ทำให้ไม่ต้องพิมพ์คำค้นอีกเลย"], a:0},
+
+{cat:"advanced", lvl:"medium", q:"ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"แพนด้า\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"การ์ตูน\" ควรพิมพ์คำค้นอย่างไร?",
+ c:["แพนด้า -การ์ตูน","แพนด้า +การ์ตูน","แพนด้า OR การ์ตูน","\"แพนด้าการ์ตูน\""], a:0},
+
+{cat:"advanced", lvl:"medium", q:"เครื่องหมายลบ (-) หน้าคำค้น มีความหมายว่าอย่างไรในการค้นหา?",
+ c:["ต้องการยกเว้นหรือไม่ต้องการให้ผลลัพธ์มีคำนั้นปรากฏอยู่","ต้องการให้ผลลัพธ์มีคำนั้นแน่นอนทุกครั้ง","ทำให้ค้นหาเฉพาะรูปภาพเท่านั้น","ทำให้ค้นหาเฉพาะวิดีโอเท่านั้น"], a:0},
+
+{cat:"advanced", lvl:"medium", q:"ถ้าต้องการค้นหาไฟล์เอกสารประเภท PDF ที่เกี่ยวกับ \"ระบบสุริยะ\" ควรใช้คำค้นแบบใด?",
+ c:["ระบบสุริยะ filetype:pdf","ระบบสุริยะ \"pdf\"","ระบบสุริยะ -pdf","ระบบสุริยะ OR pdf"], a:0},
+
+{cat:"advanced", lvl:"medium", q:"คำสั่ง site: ในการค้นหา (เช่น พิมพ์ site:wikipedia.org ตามด้วยคำค้น) มีประโยชน์อย่างไร?",
+ c:["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์นั้นเท่านั้น","ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น","เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ","ลบเว็บไซต์นั้นออกจากผลการค้นหา"], a:0},
+
+{cat:"advanced", lvl:"hard", q:"นักเรียนต้องการหาข้อมูลรายงานเรื่อง \"ภาวะโลกร้อน\" จากเว็บไซต์ราชการไทยเท่านั้น ควรพิมพ์คำค้นแบบใดจึงจะได้ผลลัพธ์ตรงความต้องการที่สุด?",
+ c:["ภาวะโลกร้อน site:go.th","ภาวะโลกร้อน -go.th","\"ภาวะโลกร้อนไทย\"","ภาวะโลกร้อน OR go.th"], a:0},
+
+{cat:"advanced", lvl:"hard", q:"ข้อใดคือคำค้นที่ \"มีประสิทธิภาพมากที่สุด\" สำหรับการหาวิธีทำการบ้านคณิตศาสตร์เรื่อง \"การหารเศษส่วน\" สำหรับนักเรียนชั้น ป.6?",
+ c:["วิธีหารเศษส่วน ป.6","คณิตศาสตร์","เศษส่วน","การบ้าน"], a:0},
+
+{cat:"advanced", lvl:"hard", q:"เมื่อค้นหาด้วยคำกว้าง ๆ เช่น \"สัตว์\" แล้วได้ผลลัพธ์เยอะเกินไปและไม่ตรงประเด็น ควรทำอย่างไรเพื่อให้ได้ข้อมูลที่ตรงความต้องการมากขึ้น?",
+ c:["เพิ่มคำค้นให้เจาะจงมากขึ้น เช่น ระบุชนิดสัตว์หรือสิ่งที่ต้องการรู้โดยเฉพาะ","ลบคำค้นทั้งหมดแล้วค้นหาใหม่ด้วยคำเดิม","เปลี่ยนไปใช้เครื่องมือค้นหาที่ช้าลง","ปิดอินเทอร์เน็ตแล้วเปิดใหม่"], a:0},
+
+{cat:"advanced", lvl:"hard", q:"การใช้ \"ตัวกรองการค้นหาขั้นสูง\" (Advanced Search) เช่น กรองตามวันที่ ภาษา หรือประเภทไฟล์ มีประโยชน์อย่างไร?",
+ c:["ช่วยจำกัดผลการค้นหาให้ตรงกับเงื่อนไขที่ต้องการมากขึ้น ลดผลลัพธ์ที่ไม่เกี่ยวข้อง","ทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้น","ทำให้เว็บไซต์ทั้งหมดปลอดภัยขึ้นโดยอัตโนมัติ","ทำให้ไม่ต้องพิมพ์คำค้นอีกต่อไป"], a:0},
+
+/* ============ AI และเทคโนโลยี (10 ข้อ) ============ */
+{cat:"ai", lvl:"easy", q:"AI ย่อมาจากอะไร?",
+ c:["Artificial Intelligence (ปัญญาประดิษฐ์)","Automatic Internet","Advanced Information","Application Interface"], a:0},
+
+{cat:"ai", lvl:"easy", q:"ข้อใดคือตัวอย่างการใช้งาน AI ในชีวิตประจำวัน?",
+ c:["ผู้ช่วยเสียงอัจฉริยะ เช่น Siri หรือ Google Assistant","เครื่องคิดเลขธรรมดา","เครื่องพิมพ์เอกสาร","วิทยุ AM/FM ทั่วไป"], a:0},
+
+{cat:"ai", lvl:"easy", q:"ระบบแนะนำวิดีโอที่ควรดูต่อไปในแอปพลิเคชันดูวิดีโอ เป็นการทำงานของเทคโนโลยีใด?",
+ c:["ปัญญาประดิษฐ์ (AI) ที่วิเคราะห์พฤติกรรมการดูของผู้ใช้","สัญญาณ Wi-Fi ที่แรงขึ้น","แบตเตอรี่ของโทรศัพท์","ความเร็วอินเทอร์เน็ตเพียงอย่างเดียว"], a:0},
+
+{cat:"ai", lvl:"medium", q:"ข้อใดอธิบายความหมายของ \"ปัญญาประดิษฐ์ (AI)\" ได้ถูกต้องที่สุด?",
+ c:["เทคโนโลยีที่ทำให้คอมพิวเตอร์สามารถเรียนรู้และตัดสินใจได้คล้ายมนุษย์ในบางเรื่อง","โปรแกรมที่ทำงานตามคำสั่งตายตัวเพียงอย่างเดียวเท่านั้น ไม่เปลี่ยนแปลง","อุปกรณ์คอมพิวเตอร์ที่มีขนาดเล็กที่สุดในโลก","ชื่อของเว็บไซต์ค้นหาข้อมูลแห่งหนึ่ง"], a:0},
+
+{cat:"ai", lvl:"medium", q:"ข้อใดคือข้อจำกัดของปัญญาประดิษฐ์ (AI) ในปัจจุบัน?",
+ c:["AI อาจให้คำตอบผิดพลาดได้หากข้อมูลที่เรียนรู้มาไม่ถูกต้องหรือไม่เพียงพอ","AI ทำงานถูกต้อง 100% เสมอไม่มีข้อผิดพลาด","AI สามารถเข้าใจความรู้สึกมนุษย์ได้อย่างสมบูรณ์แบบทุกครั้ง","AI ไม่จำเป็นต้องใช้ข้อมูลใด ๆ ในการทำงาน"], a:0},
+
+{cat:"ai", lvl:"medium", q:"แอปพลิเคชันแปลภาษาอัตโนมัติ เช่น Google Translate ใช้เทคโนโลยีใดในการทำงาน?",
+ c:["ปัญญาประดิษฐ์ที่เรียนรู้จากข้อมูลภาษาจำนวนมาก","สัญญาณดาวเทียม GPS","เซ็นเซอร์วัดอุณหภูมิ","บลูทูธ (Bluetooth)"], a:0},
+
+{cat:"ai", lvl:"medium", q:"ข้อใดคือตัวอย่าง AI ที่ช่วยกรองข้อความไม่พึงประสงค์ในกล่องข้อความหรืออีเมล?",
+ c:["ระบบกรองสแปม (Spam Filter)","โปรแกรมเล่นเพลง","เครื่องปรับอากาศ","นาฬิกาปลุก"], a:0},
+
+{cat:"ai", lvl:"hard", q:"ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่างโปรแกรมคอมพิวเตอร์ทั่วไปกับ AI?",
+ c:["โปรแกรมทั่วไปทำงานตามกฎที่ตั้งไว้ตายตัว ส่วน AI สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้","โปรแกรมทั่วไปและ AI ทำงานเหมือนกันทุกประการไม่มีความแตกต่าง","AI ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น ไม่สามารถใช้บนคอมพิวเตอร์ได้","โปรแกรมทั่วไปฉลาดกว่า AI เสมอในทุกด้าน"], a:0},
+
+{cat:"ai", lvl:"hard", q:"เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอททุกครั้งโดยไม่ตรวจสอบ?",
+ c:["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลอื่นเพิ่มเติม","เพราะ AI ทำงานช้ากว่ามนุษย์เสมอ","เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น","เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], a:0},
+
+{cat:"ai", lvl:"hard", q:"เทคโนโลยี AI มีบทบาทอย่างไรกับรถยนต์ไร้คนขับ (Self-driving car)?",
+ c:["ช่วยวิเคราะห์สภาพแวดล้อมรอบตัวรถแล้วตัดสินใจควบคุมรถได้เองโดยอัตโนมัติ","ทำให้รถวิ่งได้เร็วกว่ารถทั่วไปเสมอ","ทำให้รถไม่ต้องเติมน้ำมันหรือชาร์จไฟเลย","ทำให้ราคารถยนต์ถูกลงกว่าเดิมทุกคัน"], a:0},
+
+/* ============ ความปลอดภัยและมารยาท (10 ข้อ) ============ */
+{cat:"safety", lvl:"easy", q:"ข้อใดคือลักษณะของรหัสผ่านที่ปลอดภัย?",
+ c:["ผสมตัวอักษร ตัวเลข และสัญลักษณ์ที่คาดเดายาก และไม่บอกให้ผู้อื่นรู้","ใช้วันเดือนปีเกิดของตัวเองเพราะจำง่าย","ใช้รหัสเดียวกับเพื่อนสนิททุกคน","ใช้คำว่า \"123456\" เพราะพิมพ์เร็ว"], a:0},
+
+{cat:"safety", lvl:"easy", q:"ถ้ามีคนแปลกหน้าทางออนไลน์ขอที่อยู่บ้านและเบอร์โทรศัพท์ นักเรียนควรทำอย่างไร?",
+ c:["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู","ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติ","นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน","ลบแอปพลิเคชันทิ้งโดยไม่บอกใคร"], a:0},
+
+{cat:"safety", lvl:"easy", q:"การกลั่นแกล้งผู้อื่นทางออนไลน์ เช่น การด่าทอหรือล้อเลียนในโซเชียลมีเดีย เรียกว่าอะไร?",
+ c:["การรังแกทางไซเบอร์ (Cyberbullying)","การตลาดออนไลน์","การเข้ารหัสข้อมูล","การอัปเดตซอฟต์แวร์"], a:0},
+
+{cat:"safety", lvl:"medium", q:"หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ ควรทำอย่างไรเป็นอันดับแรก?",
+ c:["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้","ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที","เก็บเรื่องไว้คนเดียวไม่บอกใครเลย","ลบแอปทั้งหมดในโทรศัพท์ทันที"], a:0},
+
+{cat:"safety", lvl:"medium", q:"ข้อความหรืออีเมลที่อ้างว่านักเรียนถูกรางวัลใหญ่และขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?",
+ c:["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล","ข้อเสนอพิเศษที่ปลอดภัยเสมอ","ระบบแจ้งเตือนจากโรงเรียนโดยตรง","โฆษณาสินค้าทั่วไปที่ไม่มีอันตราย"], a:0},
+
+{cat:"safety", lvl:"medium", q:"ก่อนแชร์ข่าวหรือข้อมูลที่พบในอินเทอร์เน็ตต่อให้ผู้อื่น นักเรียนควรทำอย่างไร?",
+ c:["ตรวจสอบความถูกต้องจากแหล่งข้อมูลที่น่าเชื่อถือก่อนแชร์","แชร์ทันทีโดยไม่ต้องตรวจสอบเพราะเสียเวลา","แชร์เฉพาะข่าวที่มีรูปภาพสวยงามเท่านั้น","แชร์เฉพาะข่าวที่เพื่อนสนิทส่งมาโดยไม่ต้องตรวจสอบ"], a:0},
+
+{cat:"safety", lvl:"medium", q:"มารยาทที่ดีในการสื่อสารออนไลน์ (Netiquette) ควรเป็นอย่างไร?",
+ c:["ใช้คำพูดสุภาพ ให้เกียรติผู้อื่น และไม่พิมพ์ตัวใหญ่ทั้งหมดซึ่งดูเหมือนตะโกนใส่","พิมพ์ด่าทอผู้อื่นได้ถ้าไม่พอใจ","ใช้ชื่อปลอมเพื่อกลั่นแกล้งคนอื่นได้อย่างอิสระ","เผยแพร่ข้อมูลส่วนตัวของเพื่อนโดยไม่ขออนุญาต"], a:0},
+
+{cat:"safety", lvl:"hard", q:"การนำภาพหรือข้อความของผู้อื่นจากอินเทอร์เน็ตมาใช้โดยไม่ขออนุญาตและไม่ให้เครดิตเจ้าของ ถือเป็นการละเมิดสิ่งใด?",
+ c:["ลิขสิทธิ์และทรัพย์สินทางปัญญาของผู้อื่น","ความเร็วอินเทอร์เน็ตของเจ้าของผลงาน","กฎการตั้งรหัสผ่าน","การตั้งค่าเบราว์เซอร์"], a:0},
+
+{cat:"safety", lvl:"hard", q:"ข้อใดเป็นวิธีตั้งค่าความเป็นส่วนตัว (Privacy Settings) ที่เหมาะสมบนโซเชียลมีเดียสำหรับเด็ก?",
+ c:["จำกัดผู้ที่มองเห็นโพสต์และข้อมูลส่วนตัวเฉพาะคนที่รู้จักจริง ๆ","เปิดให้ทุกคนในโลกมองเห็นข้อมูลส่วนตัวได้หมด","ใส่ที่อยู่บ้านและเบอร์โทรในโปรไฟล์สาธารณะ","ยอมรับคำขอเป็นเพื่อนจากทุกคนที่ส่งมาโดยไม่ตรวจสอบ"], a:0},
+
+{cat:"safety", lvl:"hard", q:"เพราะเหตุใดการไม่เปิดเผยข้อมูลส่วนตัว เช่น ชื่อโรงเรียน ที่อยู่ หรือเบอร์โทรศัพท์ ต่อคนแปลกหน้าทางออนไลน์จึงสำคัญ?",
+ c:["เพื่อป้องกันไม่ให้คนไม่หวังดีนำข้อมูลไปใช้ในทางที่เป็นอันตรายต่อตัวเราหรือครอบครัว","เพราะทำให้อินเทอร์เน็ตช้าลง","เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ","เพราะทำให้เสียเวลาในการพิมพ์ข้อมูล"], a:0},
+];
+
+/* ---------------- QUIZ ENGINE (ป้องกันปุ่มข้ามข้อ) ---------------- */
+let order = [];
+let current = 0;
+let score = 0;
+let answers = [];
+let currentShuffleMap = [];
+let answered = false;
+let isTransitioning = false;
+
+function shuffleIndices(n){
+  return Array.from({length:n}, (_,i)=>i);
+}
+
+function shuffleArray(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(){
+  order = shuffleIndices(quizData.length);
+  current = 0; score = 0; answers = []; answered = false; isTransitioning = false;
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  buildProgressPath();
+  renderQuestion();
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function buildProgressPath(){
+  const path = document.getElementById('progress-path');
+  path.innerHTML = '';
+  quizData.forEach((_, idx)=>{
+    const node = document.createElement('div');
+    node.className = 'node';
+    node.id = 'node-' + idx;
+    path.appendChild(node);
+  });
+}
+
+function updateProgressPath(){
+  quizData.forEach((_, idx)=>{
+    const node = document.getElementById('node-'+idx);
+    node.classList.remove('current','done-correct','done-wrong');
+    if(idx < current) node.classList.add(answers[idx].chosen === answers[idx].ans ? 'done-correct' : 'done-wrong');
+    else if(idx === current) node.classList.add('current');
+  });
+}
+
+function renderQuestion(){
+  answered = false;
+  isTransitioning = false;
+
+  const qIdx = order[current];
+  const item = quizData[qIdx];
+
+  document.getElementById('q-index').textContent = current + 1;
+  document.getElementById('score-live').textContent = score;
+
+  const pill = document.getElementById('cat-pill');
+  pill.textContent = CAT[item.cat].label;
+  pill.className = 'category-pill ' + CAT[item.cat].pill;
+
+  const lvlPill = document.getElementById('level-pill');
+  const lvlInfo = LEVEL[item.lvl];
+  lvlPill.querySelector('.level-text').textContent = lvlInfo.label;
+  lvlPill.querySelector('.dot').style.background = lvlInfo.color;
+
+  document.getElementById('q-text').textContent = item.q;
+
+  const lettersUI = ['ก','ข','ค','ง'];
+  currentShuffleMap = shuffleArray([0,1,2,3]);
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  currentShuffleMap.forEach((origIdx, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="letter">${lettersUI[i]}</span><span>${item.c[origIdx]}</span>`;
+    btn.onclick = ()=> selectAnswer(origIdx);
+    choicesEl.appendChild(btn);
+  });
+
+  document.getElementById('feedback').classList.add('hidden');
+  const nb = document.getElementById('next-btn');
+  nb.classList.remove('show');
+  nb.disabled = false;
+}
+
+function selectAnswer(origIdx){
+  if(answered) return;
+  answered = true;
+
+  const qIdx = order[current];
+  const item = quizData[qIdx];
+  const buttons = document.querySelectorAll('.choice-btn');
+  buttons.forEach(b => b.disabled = true);
+
+  const isCorrect = origIdx === item.a;
+  if(isCorrect) score++;
+
+  const correctDisplayIdx = currentShuffleMap.indexOf(item.a);
+  buttons[correctDisplayIdx].classList.add('correct');
+  if(!isCorrect){
+    const chosenDisplayIdx = currentShuffleMap.indexOf(origIdx);
+    buttons[chosenDisplayIdx].classList.add('wrong');
+  }
+
+  const fb = document.getElementById('feedback');
+  fb.classList.remove('hidden');
+  if(isCorrect){
+    fb.className = 'feedback ok';
+    fb.textContent = '✓ ถูกต้อง!';
+  } else {
+    fb.className = 'feedback no';
+    const lettersUI = ['ก','ข','ค','ง'];
+    fb.textContent = `✗ ยังไม่ถูก คำตอบที่ถูกต้องคือ ${lettersUI[correctDisplayIdx]}. ${item.c[item.a]}`;
+  }
+
+  answers[qIdx] = { chosen: origIdx, ans: item.a, cat: item.cat, q: item.q, choices: item.c };
+  document.getElementById('score-live').textContent = score;
+  document.getElementById('next-btn').classList.add('show');
+  updateProgressPath();
+}
+
+function nextQuestion(){
+  if(isTransitioning) return;
+  isTransitioning = true;
+  const nb = document.getElementById('next-btn');
+  nb.disabled = true;
+
+  if(current < order.length - 1){
+    current++;
+    renderQuestion();
+    window.scrollTo({top:0, behavior:'smooth'});
+  } else {
+    showResults();
+  }
+}
+
+function showResults(){
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+
+  document.getElementById('final-score').textContent = score;
+  const pct = Math.round((score/quizData.length)*100);
+
+  const label = document.getElementById('result-label');
+  const sub = document.getElementById('result-sub');
+  if(pct >= 90){ label.textContent = 'ยอดเยี่ยมมาก! นักท่องเน็ตอัจฉริยะตัวจริง'; }
+  else if(pct >= 75){ label.textContent = 'เก่งมาก! เข้าใจการใช้อินเทอร์เน็ตอย่างปลอดภัยดี'; }
+  else if(pct >= 60){ label.textContent = 'ทำได้ดี ลองทบทวนอีกนิด'; }
+  else { label.textContent = 'ยังต้องฝึกฝนเพิ่มเติม สู้ ๆ นะ'; }
+  sub.textContent = `ทำถูก ${score} จาก ${quizData.length} ข้อ (${pct}%)`;
+
+  const catCount = { browser:{c:0,t:0}, advanced:{c:0,t:0}, ai:{c:0,t:0}, safety:{c:0,t:0} };
+  quizData.forEach((item, idx)=>{
+    catCount[item.cat].t++;
+    if(answers[idx] && answers[idx].chosen === item.a) catCount[item.cat].c++;
+  });
+
+  const colorMap = { browser:'var(--browser)', advanced:'var(--advanced)', ai:'var(--ai)', safety:'var(--safety)' };
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '';
+  Object.keys(catCount).forEach(key=>{
+    const {c,t} = catCount[key];
+    const div = document.createElement('div');
+    div.className = 'bd-card';
+    div.innerHTML = `
+      <div class="bd-title">${CAT[key].label}</div>
+      <div class="bd-num">${c}<span style="font-size:14px;color:var(--text-dim)">/${t}</span></div>
+      <div class="bd-bar"><div style="width:${(c/t)*100}%; background:${colorMap[key]}"></div></div>
+    `;
+    bd.appendChild(div);
+  });
+
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '<h3 style="margin:0 0 4px;">เฉลยและทบทวนคำตอบ</h3>';
+  const lettersUI = ['ก','ข','ค','ง'];
+  quizData.forEach((item, idx)=>{
+    const ans = answers[idx];
+    const wasCorrect = ans && ans.chosen === item.a;
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `
+      <div class="rq"><b>ข้อ ${idx+1}. [${LEVEL[item.lvl].label}]</b> ${item.q}</div>
+      <div class="ra ${wasCorrect ? 'ok' : 'no'}">
+        เฉลย: ${lettersUI[item.a]}. ${item.c[item.a]}
+        ${!wasCorrect && ans ? `<span class="given">คำตอบที่คุณเลือก: ${lettersUI[ans.chosen]}. ${item.c[ans.chosen]}</span>` : ''}
+      </div>
+    `;
+    reviewList.appendChild(div);
+  });
+}
+
+function restartQuiz(){
+  document.getElementById('result-screen').classList.add('hidden');
+  document.getElementById('start-screen').classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function scrollToTop(){
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>

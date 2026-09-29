@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ภารกิจนักท่องเน็ตอัจฉริยะ | โหมดด่าน (20 ด่าน)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1B2A; --bg-2: #14273D; --panel: #1B3049; --panel-2: #223B57; --line: #33526E;
+    --text: #EAF2F8; --text-dim: #9FB8CC;
+    --browser: #4FA3E3; --browser-dim: #29406B;
+    --advanced: #5FE0D0; --advanced-dim: #1F4A48;
+    --ai: #C97BF0; --ai-dim: #4A3468;
+    --safety: #F2607B; --safety-dim: #5B2C38;
+    --wrong: #EF6161; --gold: #FFC857;
+    --easy: #2FBF71; --medium: #F2C94C; --hard: #EF6161;
+    --pass: #2FBF71; --fail: #EF6161; --locked: #4A4058;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  html{ overscroll-behavior-y: none; height:100%; }
+  body{
+    background: radial-gradient(circle at 50% 0%, var(--bg-2), var(--bg) 55%);
+    color: var(--text); font-family:'Sarabun', sans-serif;
+    min-height:100vh; min-height:100dvh; overscroll-behavior-y: none;
+    padding: 28px 16px 60px;
+    padding-top: calc(28px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
+  }
+  h1,h2,h3, .display{ font-family:'Kanit', sans-serif; }
+  .wrap{ max-width: 880px; margin: 0 auto; }
+  .circuit-bg{
+    position: fixed; inset:0; z-index:-1; opacity:0.28;
+    background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(circle at 50% 6%, black 0%, transparent 65%);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; margin-bottom: 26px; }
+  .brand .tag{
+    font-family:'Kanit'; font-size:12px; letter-spacing:.14em; color: var(--gold);
+    border:1px solid rgba(255,200,87,.4); padding:4px 10px; border-radius:999px; text-transform:uppercase;
+  }
+  .brand .line{ flex:1; height:1px; background: var(--line); }
+  .hero{
+    background: linear-gradient(160deg, var(--panel), var(--panel-2));
+    border:1px solid var(--line); border-radius: 20px; padding: 34px 30px;
+  }
+  .hero h1{ font-size: clamp(26px,5vw,38px); margin:0 0 10px; font-weight:800; line-height:1.15; }
+  .hero p.sub{ color:var(--text-dim); font-size:16px; margin:0 0 20px; max-width:64ch; }
+  .rule-panel{
+    background: rgba(239,97,97,.10); border:1.5px solid rgba(239,97,97,.4);
+    border-radius:14px; padding:18px 18px; font-size:14px; color:#FBD9D9; margin-bottom:20px;
+  }
+  .rule-panel .rule-title{ font-family:'Kanit'; font-weight:800; margin-bottom:10px; color:#FF8A8A; font-size:16px; display:flex; align-items:center; gap:8px;}
+  .rule-panel ul{ margin:6px 0 0; padding-left:20px; line-height:1.85; }
+  .rule-panel b{ color:#FFB6B6; }
+  .student-id-panel{
+    background: rgba(255,255,255,.04); border:1.5px solid var(--line);
+    border-radius:14px; padding:18px; margin-bottom:20px;
+  }
+  .student-id-title{ font-family:'Kanit'; font-weight:700; font-size:15px; margin-bottom:12px; color:var(--text); }
+  .student-id-row{ display:flex; gap:10px; flex-wrap:wrap; }
+  .student-id-row select{
+    flex:1; min-width:140px; background: var(--panel-2); border:1.5px solid var(--line); color: var(--text);
+    font-family:'Sarabun'; font-size:15px; padding:11px 12px; border-radius:10px; cursor:pointer;
+  }
+  .student-status{ margin-top:12px; font-size:13.5px; font-family:'Kanit'; color: var(--text-dim); line-height:1.6; }
+  .student-status.ready{ color:#8DE8B4; }
+  .start-btn:disabled{ opacity:.4; cursor:not-allowed; box-shadow:none; }
+  .student-id-badge{
+    display:inline-flex; align-items:center; gap:6px; font-family:'Kanit'; font-size:12.5px; font-weight:600;
+    background: var(--panel-2); border:1px solid var(--line); color: var(--text-dim); padding:6px 14px; border-radius:999px; margin-bottom:14px;
+  }
+  .start-btn{
+    appearance:none; border:none; cursor:pointer;
+    background: linear-gradient(135deg, var(--gold), #E8A93A);
+    color:#241B00; font-family:'Kanit'; font-weight:700; font-size:17px;
+    padding:15px 30px; border-radius:12px; box-shadow: 0 10px 24px -8px rgba(255,200,87,.5);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .start-btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 28px -8px rgba(255,200,87,.65); }
+  .start-btn:active{ transform: translateY(0px) scale(.98); }
+  .hidden{ display:none !important; }
+
+  .level-map-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+  .level-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap:14px; }
+  .level-tile{
+    background: linear-gradient(160deg, var(--panel), var(--panel-2)); border:1.5px solid var(--line); border-radius:16px;
+    padding:18px 12px; text-align:center; cursor:pointer; transition: transform .15s ease, border-color .15s ease;
+  }
+  .level-tile:hover:not(.locked){ transform: translateY(-3px); border-color: var(--gold); }
+  .level-tile .num{ font-family:'Kanit'; font-weight:800; font-size:26px; }
+  .level-tile .label{ font-family:'Kanit'; font-size:11.5px; color: var(--text-dim); margin-top:4px; }
+  .level-tile.locked{ opacity:.45; cursor:not-allowed; }
+  .level-tile.passed{ border-color: var(--pass); box-shadow: 0 0 0 1px var(--pass) inset; }
+  .level-tile.passed .num{ color: var(--pass); }
+  .level-tile.current{ border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold) inset; }
+  .level-tile .icon{ font-size:20px; margin-bottom:4px; display:block; }
+  .level-tile .attempts{ font-size:10.5px; color: var(--text-dim); margin-top:4px; }
+
+  .progress-path{ display:flex; gap:3px; margin: 4px 0 22px; flex-wrap:wrap; }
+  .progress-path .node{ width: 15px; height:15px; border-radius:4px; background: var(--panel-2); border:1px solid var(--line); transition: background .2s ease, transform .15s ease; }
+  .progress-path .node.current{ transform: scale(1.35); border-color: var(--gold); }
+  .progress-path .node.answered{ background: var(--gold); border-color: var(--gold); }
+  .top-info{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  .q-counter{ font-family:'Kanit'; font-weight:600; font-size:15px; color:var(--text-dim);}
+  .q-counter b{ color:var(--text); }
+  .level-badge{ font-family:'Kanit'; font-weight:700; font-size:14px; background: var(--panel-2); border:1px solid var(--line); padding:6px 14px; border-radius:999px; }
+  .pill-row{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .category-pill{ display:inline-block; font-family:'Kanit'; font-size:12px; font-weight:600; padding:5px 12px; border-radius:999px; letter-spacing:.02em; }
+  .cat-browser{ background: var(--browser-dim); color:#A9D2F5; }
+  .cat-advanced{ background: var(--advanced-dim); color:#A8F0E6; }
+  .cat-ai{ background: var(--ai-dim); color:#E0B6FA; }
+  .cat-safety{ background: var(--safety-dim); color:#F8B3C0; }
+  .level-pill{ display:inline-flex; align-items:center; gap:5px; font-family:'Kanit'; font-size:12px; font-weight:600; padding:5px 12px; border-radius:999px; background: var(--panel-2); color:var(--text-dim); }
+  .level-pill .dot{ width:7px; height:7px; border-radius:50%; }
+  .q-card{ background: linear-gradient(160deg, var(--panel), #16283C); border:1px solid var(--line); border-radius:18px; padding: 26px 24px 22px; }
+  .q-text{ font-size: 17.5px; line-height:1.85; margin:0 0 18px; font-weight:500; white-space: pre-line; }
+  .hint-toggle-row{ margin: -8px 0 16px; }
+  .hint-toggle-btn{
+    appearance:none; cursor:pointer; font-family:'Kanit'; font-weight:600; font-size:13px;
+    background: rgba(255,200,87,.1); border:1px dashed rgba(255,200,87,.4); color: var(--gold);
+    padding:8px 14px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;
+  }
+  .hint-toggle-btn:hover{ background: rgba(255,200,87,.18); }
+  .hint-panel{
+    background: rgba(255,200,87,.08); border:1px dashed rgba(255,200,87,.4);
+    border-radius:12px; padding:14px 16px; font-size:13.5px; line-height:1.85; color:#F0E3B8;
+    margin: 0 0 18px; white-space: pre-line;
+  }
+  .hint-panel b{ color: var(--gold); font-family:'Kanit'; }
+  .choices{ display:flex; flex-direction:column; gap:10px; }
+  .choice-btn{
+    text-align:left; width:100%; background: var(--panel-2); border:1.5px solid var(--line);
+    color: var(--text); font-family:'Sarabun'; font-size:15.5px; line-height:1.5;
+    padding: 13px 16px; border-radius:12px; cursor:pointer;
+    display:flex; gap:12px; align-items:flex-start;
+    transition: border-color .15s ease, background .15s ease, transform .1s ease;
+  }
+  .choice-btn .letter{
+    font-family:'Kanit'; font-weight:700; font-size:13px; width:24px; height:24px; min-width:24px; border-radius:7px;
+    background: var(--bg); display:flex; align-items:center; justify-content:center; color: var(--text-dim); margin-top:1px;
+  }
+  .choice-btn:hover:not(:disabled){ border-color: var(--gold); transform: translateX(2px); }
+  .choice-btn.selected{ border-color: var(--gold); background: #4A3A1A; }
+  .choice-btn.selected .letter{ background: var(--gold); color:#241B00; }
+  .nav-row{ display:flex; justify-content:space-between; margin-top:20px; align-items:center; }
+  .back-map-link{ font-family:'Kanit'; font-size:13px; color:var(--text-dim); cursor:pointer; text-decoration:underline; }
+  .next-btn{
+    appearance:none; border:none; cursor:pointer; background: var(--gold); color:#241B00; font-family:'Kanit'; font-weight:700; font-size:15px;
+    padding:11px 24px; border-radius:10px; opacity:.4; pointer-events:none; transition: opacity .2s ease, transform .15s ease;
+  }
+  .next-btn.show{ opacity:1; pointer-events:auto; }
+  .next-btn:hover{ transform: translateY(-1px); }
+
+  .result-hero{ text-align:center; padding: 40px 24px; background: linear-gradient(160deg, var(--panel), var(--panel-2)); border:1px solid var(--line); border-radius:20px; }
+  .result-hero.is-pass{ border-color: var(--pass); box-shadow: 0 0 0 1px var(--pass) inset; }
+  .result-hero.is-fail{ border-color: var(--fail); box-shadow: 0 0 0 1px var(--fail) inset; }
+  .result-score{ font-family:'Kanit'; font-weight:800; font-size:56px; margin: 10px 0 4px; }
+  .result-score span{ font-size:28px; color: var(--text-dim); font-weight:600; }
+  .result-label{ font-family:'Kanit'; font-size:18px; color: var(--gold); font-weight:700; }
+  .result-sub{ color: var(--text-dim); margin-top:8px; font-size:14.5px; }
+  .verdict-banner{ margin-top:26px; border-radius:16px; padding: 22px 20px; font-family:'Kanit'; }
+  .verdict-banner.pass{ background: rgba(47,191,113,.14); border:2px solid var(--pass); }
+  .verdict-banner.fail{ background: rgba(239,97,97,.14); border:2px solid var(--fail); }
+  .verdict-title{ font-size: 26px; font-weight:800; }
+  .verdict-banner.pass .verdict-title{ color: var(--pass); }
+  .verdict-banner.fail .verdict-title{ color: var(--fail); }
+  .verdict-sub{ font-size:14.5px; color: var(--text-dim); margin-top:6px; font-family:'Sarabun'; }
+  .review-list{ margin-top: 30px; display:flex; flex-direction:column; gap:12px; }
+  .review-item{ background: var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px 18px; }
+  .review-item .rq{ font-size:14.5px; line-height:1.65; margin-bottom:10px; white-space: pre-line; }
+  .review-item .ra{ font-size:13.5px; font-family:'Kanit'; color:#8DE8B4;}
+  .review-item .exp{
+    margin-top:12px; background: rgba(255,200,87,.08); border:1px dashed rgba(255,200,87,.4);
+    border-radius:10px; padding:12px 14px; font-size:13.5px; line-height:1.75; color:#F0E3B8; white-space: pre-line;
+  }
+  .review-item .exp b.exp-title{ font-family:'Kanit'; color: var(--gold); display:block; margin-bottom:6px; }
+  .action-row{ display:flex; gap:12px; justify-content:center; margin-top:28px; flex-wrap:wrap; }
+  .ghost-btn{
+    appearance:none; cursor:pointer; font-family:'Kanit'; font-weight:600; font-size:14.5px;
+    background:transparent; border:1.5px solid var(--line); color:var(--text); padding:11px 22px; border-radius:10px;
+  }
+  .ghost-btn:hover{ border-color: var(--gold); color: var(--gold); }
+  .primary-action-btn{
+    appearance:none; cursor:pointer; font-family:'Kanit'; font-weight:700; font-size:14.5px;
+    background: var(--gold); color:#241B00; border:none; padding:11px 26px; border-radius:10px;
+  }
+  footer.credit{ text-align:center; color:var(--text-dim); font-size:12.5px; margin-top:34px; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="circuit-bg"></div>
+<div class="wrap">
+
+  <!-- ============ START SCREEN ============ -->
+  <div id="start-screen">
+    <div class="brand">
+      <span class="tag">วิทยาการคำนวณ · ป.6 · โหมดด่าน (20 ด่าน)</span>
+      <div class="line"></div>
+    </div>
+    <div class="hero">
+      <h1>ภารกิจนักท่องเน็ตอัจฉริยะ<br>โหมดด่าน (20 ด่าน)</h1>
+      <p class="sub">โจทย์เรื่อง "การใช้อินเทอร์เน็ตค้นหาข้อมูลอย่างมีประสิทธิภาพ" และ "เทคโนโลยีสารสนเทศและความปลอดภัย" ครอบคลุม 4 หมวด ได้แก่ เบราว์เซอร์และการค้นหา, เทคนิคการค้นหาขั้นสูง, AI และเทคโนโลยี, ความปลอดภัยและมารยาท แบ่งเป็น 20 ด่าน ด่านละ 10 ข้อ ไม่ซ้ำกัน <b style="color:var(--gold)">ความยากจะค่อย ๆ เพิ่มขึ้นทีละด่านเหมือนเกม</b> — ด่านแรก ๆ ง่ายมาก แล้วค่อย ๆ ยากขึ้นจนถึงด่านสุดท้ายที่โหดที่สุด ต้องผ่านด่านก่อนหน้าจึงจะปลดล็อกด่านถัดไป</p>
+
+      <div class="rule-panel">
+        <div class="rule-title">⚠️ กติกาโหมดด่าน</div>
+        <ul>
+          <li>แต่ละด่านมี <b>10 ข้อ</b> ต้องตอบ<b>ถูกครบทั้ง 10 ข้อ (10/10)</b> จึงจะ<b>"ผ่านด่าน"</b> และปลดล็อกด่านถัดไป</li>
+          <li>ระหว่างทำข้อสอบ <b>จะไม่มีการเฉลยทันทีว่าข้อไหนถูก/ผิด</b> ต้องตอบให้ครบก่อนถึงจะเห็นผลรวม</li>
+          <li>ถ้า<b>ไม่ผ่านด่าน</b> จะเห็นแค่คะแนนรวมและคำว่า "ไม่ผ่าน" เท่านั้น <b>จะไม่มีการเฉลยคำตอบให้เลย</b> ต้องลองทำด่านนั้นใหม่ (โจทย์ชุดเดิมแต่สลับลำดับข้อและตัวเลือกใหม่ทุกครั้ง)</li>
+          <li>ถ้า<b>ผ่านด่าน</b> จะเห็นเฉลยพร้อมคำอธิบายครบทุกข้อทันที และปลดล็อกด่านถัดไป</li>
+          <li>🔒 ระบบบันทึกความคืบหน้าแยกตามห้อง+เลขที่ของนักเรียนแต่ละคน ต่อให้ปิดแท็บ/รีเฟรชหน้า ก็จะกลับมาที่ด่านเดิมเสมอ (ต้องให้ครูเป็นผู้กดรีเซ็ตเท่านั้น)</li>
+        </ul>
+      </div>
+
+      <div class="student-id-panel">
+        <div class="student-id-title">👤 กรอกข้อมูลก่อนเริ่มทำข้อสอบ</div>
+        <div class="student-id-row">
+          <select id="room-select" onchange="refreshStudentStatus()">
+            <option value="">-- เลือกห้อง --</option>
+          </select>
+          <select id="number-select" onchange="refreshStudentStatus()">
+            <option value="">-- เลือกเลขที่ --</option>
+          </select>
+        </div>
+        <div class="student-status" id="student-status">กรุณาเลือกห้องและเลขที่ก่อนเริ่มทำข้อสอบ</div>
+      </div>
+
+      <button class="start-btn" id="start-btn" onclick="onStartBtnClick()" disabled>เริ่ม / ไปที่แผนที่ด่าน</button>
+    </div>
+  </div>
+
+  <!-- ============ LEVEL MAP SCREEN ============ -->
+  <div id="map-screen" class="hidden">
+    <div class="student-id-badge" id="map-student-badge"></div>
+    <div class="level-map-header">
+      <h2 style="margin:0;">แผนที่ด่าน (20 ด่าน)</h2>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="back-map-link" onclick="goToStartScreen()">🔁 เปลี่ยนคน/เปลี่ยนห้อง</span>
+        <button class="ghost-btn" onclick="teacherReset()">🔑 รีเซ็ตความคืบหน้า (ครูเท่านั้น)</button>
+      </div>
+    </div>
+    <div class="level-grid" id="level-grid"></div>
+    <footer class="credit">ภารกิจนักท่องเน็ตอัจฉริยะ · โหมดด่าน · วิทยาการคำนวณ ป.6</footer>
+  </div>
+
+  <!-- ============ QUIZ SCREEN ============ -->
+  <div id="quiz-screen" class="hidden">
+    <div class="student-id-badge" id="active-student-badge"></div>
+    <div class="top-info">
+      <div class="q-counter">ข้อที่ <b id="q-index">1</b> / 10</div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <span class="back-map-link" onclick="goToStartScreen()">🔁 เปลี่ยนคน</span>
+        <div class="level-badge">ด่านที่ <span id="level-num-live"></span></div>
+      </div>
+    </div>
+    <div class="progress-path" id="progress-path"></div>
+
+    <div class="q-card">
+      <div class="pill-row">
+        <span class="category-pill" id="cat-pill">หมวด</span>
+        <span class="level-pill" id="level-pill"><span class="dot"></span><span class="level-text"></span></span>
+      </div>
+      <p class="q-text" id="q-text"></p>
+      <div class="hint-toggle-row">
+        <button class="hint-toggle-btn" onclick="toggleHint()" id="hint-btn">💡 ดูคำใบ้</button>
+      </div>
+      <div class="hint-panel hidden" id="hint-panel"></div>
+      <div class="choices" id="choices"></div>
+      <div class="nav-row">
+        <span class="back-map-link" onclick="confirmBackToMap()">← กลับแผนที่ด่าน</span>
+        <button class="next-btn" id="next-btn" onclick="nextQuestion()">ข้อถัดไป →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RESULT SCREEN ============ -->
+  <div id="result-screen" class="hidden">
+    <div class="student-id-badge" id="result-student-badge"></div>
+    <div class="result-hero" id="result-hero">
+      <div class="result-label" id="result-label">ผลด่านที่ <span id="result-level-num"></span></div>
+      <div class="result-score"><span id="final-score">0</span><span>/10</span></div>
+      <div class="result-sub" id="result-sub"></div>
+
+      <div class="verdict-banner" id="verdict-banner">
+        <div class="verdict-title" id="verdict-title"></div>
+        <div class="verdict-sub" id="verdict-sub"></div>
+      </div>
+    </div>
+
+    <div class="review-list" id="review-list"></div>
+
+    <div class="action-row" id="result-actions"></div>
+  </div>
+
+  <footer class="credit" id="global-footer">ภารกิจนักท่องเน็ตอัจฉริยะ · โหมดด่าน (20 ด่าน) · วิทยาการคำนวณ ป.6</footer>
+</div>
+
+<script>
+const ROOMS = ["ป.6/1", "ป.6/2", "ป.6/3", "ป.6/4"];
+const MAX_NUMBER = 30;
+const TOTAL_LEVELS = 20;
+const TEACHER_RESET_PIN = '0000';
+const STORAGE_PREFIX = 'internet_quiz_levels_state_v1__';
+const ACTIVE_STUDENT_KEY = 'internet_quiz_levels_active_student_v1';
+
+const CAT = {
+  browser:  { label: "เบราว์เซอร์และการค้นหา", pill: "cat-browser" },
+  advanced: { label: "เทคนิคการค้นหาขั้นสูง", pill: "cat-advanced" },
+  ai:       { label: "AI และเทคโนโลยี", pill: "cat-ai" },
+  safety:   { label: "ความปลอดภัยและมารยาท", pill: "cat-safety" },
+};
+
+const LEVEL_LABEL = {
+  easy:   { label: "ระดับง่าย",     color: "var(--easy)" },
+  medium: { label: "ระดับปานกลาง", color: "var(--medium)" },
+  hard:   { label: "ระดับยาก",     color: "var(--hard)" },
+};
+
+const HINTS = {
+  browser: "💡 หลักการคิด:\nนึกถึงหน้าที่จริงของเบราว์เซอร์/เครื่องมือค้นหา หรือฟีเจอร์นั้น ๆ ว่าใช้ทำอะไรในชีวิตประจำวัน",
+  advanced: "💡 หลักการคิด:\nจำสัญลักษณ์สำคัญ: เครื่องหมายคำพูด \" \" = ค้นหาแบบตรงตัว, เครื่องหมายลบ (-) = ยกเว้นคำนั้น, site: = จำกัดเว็บไซต์, filetype: = จำกัดประเภทไฟล์, OR = อย่างใดอย่างหนึ่ง",
+  ai: "💡 หลักการคิด:\nAI คือระบบที่เรียนรู้จากข้อมูลและปรับตัวได้ ต่างจากโปรแกรมทั่วไปที่ทำตามคำสั่งตายตัว และ AI อาจผิดพลาดได้หากข้อมูลไม่ถูกต้อง",
+  safety: "💡 หลักการคิด:\nยึดหลัก: ไม่ให้ข้อมูลส่วนตัวกับคนแปลกหน้า, ตรวจสอบก่อนเชื่อ/แชร์, บอกผู้ใหญ่ที่ไว้ใจได้เมื่อมีปัญหา, และให้เกียรติผู้อื่นเสมอ",
+};
+
+const LEVEL_DATA = [[{"q": "ข้อใดคือหน้าที่หลักของเว็บเบราว์เซอร์ (Web Browser)?", "c": ["ใช้เปิดดูและเข้าถึงเว็บไซต์ต่าง ๆ บนอินเทอร์เน็ต", "ใช้พิมพ์เอกสารรายงาน", "ใช้ตัดต่อวิดีโอ", "ใช้เล่นเกมออฟไลน์"], "a": 0, "exp": "เว็บเบราว์เซอร์เป็นโปรแกรมที่ใช้เปิดดูและเข้าถึงเว็บไซต์ต่าง ๆ บนอินเทอร์เน็ต", "lvl": "easy", "cat": "browser"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".ac.th\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["สถาบันการศึกษาในประเทศไทย", "สถาบันการศึกษาในต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา)", "หน่วยงานทางทหารของต่างประเทศ", "องค์กรที่เกี่ยวข้องกับโครงสร้างเครือข่ายอินเทอร์เน็ต"], "a": 0, "exp": "โดเมน \".ac.th\" มักใช้กับสถาบันการศึกษาในประเทศไทย จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Microsoft Word", "Google Chrome", "Mozilla Firefox", "Safari"], "a": 0, "exp": "Microsoft Word เป็นโปรแกรมพิมพ์เอกสาร ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นเป็นเว็บเบราว์เซอร์ทั้งหมด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Microsoft Word", "Mozilla Firefox", "Microsoft Edge", "Brave"], "a": 0, "exp": "Microsoft Word เป็นโปรแกรมสำหรับพิมพ์และแก้ไขเอกสารข้อความ ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "เครื่องมือค้นหา (Search Engine) มีหน้าที่หลักคืออะไร?", "c": ["ช่วยค้นหาข้อมูลหรือเว็บไซต์ที่ต้องการจากคำค้นที่พิมพ์เข้าไป", "ใช้เก็บรหัสผ่านทั้งหมดของผู้ใช้", "ใช้สแกนไวรัสในเครื่องคอมพิวเตอร์", "ใช้พิมพ์และแก้ไขเอกสาร"], "a": 0, "exp": "เครื่องมือค้นหาช่วยค้นหาข้อมูลหรือเว็บไซต์ที่ต้องการจากคำค้นที่พิมพ์เข้าไป", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Google", "Microsoft Word", "Microsoft PowerPoint", "โปรแกรม Paint"], "a": 0, "exp": "Google เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Google", "Microsoft Word", "Adobe Photoshop", "Windows Media Player"], "a": 0, "exp": "Google เป็นตัวอย่างของเครื่องมือค้นหา ส่วนตัวเลือกอื่นเป็นโปรแกรมประเภทอื่น", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"ช้างไทย\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"ช้างไทย\" (ใส่เครื่องหมายคำพูดครอบ)", "ช้า+งไทย", "ช้างไทย OR คำอื่น", "ช้างไทย -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"ช้างไทย\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาคำว่า \"ช้างไทย\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"ช้างไทย\" (ใส่เครื่องหมายคำพูดครอบ)", "ช้าง+ไทย", "ช้าง OR ไทย", "ช้าง -ไทย"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี จะทำให้ค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ผู้ช่วยเสียงอัจฉริยะ (เช่น Siri หรือ Google Assistant)", "ร่มกันฝน", "เครื่องคิดเลขธรรมดา", "เครื่องพิมพ์เอกสาร"], "a": 0, "exp": "ผู้ช่วยเสียงอัจฉริยะ (เช่น Siri หรือ Google Assistant) เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}], [{"q": "เครื่องหมายคำพูด (\" \") ในการค้นหา มีประโยชน์อย่างไร?", "c": ["ทำให้ค้นหาคำหรือวลีตรงตัวตามที่พิมพ์ไว้พอดี ไม่แยกคำ", "ทำให้ผลการค้นหาปรากฏเป็นภาพเท่านั้น", "ทำให้ค้นหาได้เร็วขึ้นสองเท่า", "ทำให้ไม่ต้องพิมพ์คำค้นอีกเลย"], "a": 0, "exp": "เครื่องหมายคำพูดทำให้ค้นหาคำหรือวลีตรงตัวตามที่พิมพ์ไว้พอดี ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอที่อยู่บ้านจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "AI ย่อมาจากอะไร?", "c": ["Artificial Intelligence (ปัญญาประดิษฐ์)", "Automatic Internet", "Advanced Information", "Application Interface"], "a": 0, "exp": "AI ย่อมาจาก Artificial Intelligence แปลว่าปัญญาประดิษฐ์", "lvl": "easy", "cat": "ai"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".go.th\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["หน่วยงานราชการไทย", "องค์กรที่เกี่ยวข้องกับโครงสร้างเครือข่ายอินเทอร์เน็ต", "บริษัทธุรกิจที่จดทะเบียนในไทย", "องค์กรไม่แสวงหากำไรระดับสากล"], "a": 0, "exp": "โดเมน \".go.th\" มักใช้กับหน่วยงานราชการไทย จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI ในชีวิตประจำวัน?", "c": ["ผู้ช่วยเสียงอัจฉริยะ เช่น Siri หรือ Google Assistant", "เครื่องคิดเลขธรรมดา", "เครื่องพิมพ์เอกสาร", "วิทยุ AM/FM ทั่วไป"], "a": 0, "exp": "ผู้ช่วยเสียงอัจฉริยะเป็นตัวอย่างของเทคโนโลยี AI ที่ใช้ในชีวิตประจำวัน", "lvl": "easy", "cat": "ai"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Microsoft Excel", "Safari", "Brave", "Opera"], "a": 0, "exp": "Microsoft Excel เป็นโปรแกรมสำหรับคำนวณและจัดการข้อมูลตัวเลขในตาราง ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ระบบแนะนำวิดีโอที่ควรดูต่อไปในแอปพลิเคชันดูวิดีโอ เป็นการทำงานของเทคโนโลยีใด?", "c": ["ปัญญาประดิษฐ์ (AI) ที่วิเคราะห์พฤติกรรมการดูของผู้ใช้", "สัญญาณ Wi-Fi ที่แรงขึ้น", "แบตเตอรี่ของโทรศัพท์", "ความเร็วอินเทอร์เน็ตเพียงอย่างเดียว"], "a": 0, "exp": "ระบบแนะนำวิดีโอใช้ AI วิเคราะห์พฤติกรรมการดูของผู้ใช้เพื่อแนะนำเนื้อหาที่เหมาะสม", "lvl": "easy", "cat": "ai"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Bing", "Adobe Photoshop", "โปรแกรม Zoom", "Microsoft Excel"], "a": 0, "exp": "Bing เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือลักษณะของรหัสผ่านที่ปลอดภัย?", "c": ["ผสมตัวอักษร ตัวเลข และสัญลักษณ์ที่คาดเดายาก และไม่บอกให้ผู้อื่นรู้", "ใช้วันเดือนปีเกิดของตัวเองเพราะจำง่าย", "ใช้รหัสเดียวกับเพื่อนสนิททุกคน", "ใช้คำว่า \"123456\" เพราะพิมพ์เร็ว"], "a": 0, "exp": "รหัสผ่านที่ปลอดภัยควรผสมตัวอักษร ตัวเลข และสัญลักษณ์ที่คาดเดายาก และไม่บอกให้ผู้อื่นรู้", "lvl": "easy", "cat": "safety"}, {"q": "ถ้าต้องการค้นหาคำว่า \"แมวเปอร์เซีย\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"แมวเปอร์เซีย\" (ใส่เครื่องหมายคำพูดครอบ)", "แมวเปอ+ร์เซีย", "แมวเปอร์เซีย OR คำอื่น", "แมวเปอร์เซีย -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"แมวเปอร์เซีย\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}], [{"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอที่อยู่บ้านและเบอร์โทรศัพท์ นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติ", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใคร"], "a": 0, "exp": "ควรปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครูทันที", "lvl": "easy", "cat": "safety"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ระบบแนะนำวิดีโอที่ควรดูต่อในแอปดูวิดีโอ", "ไฟฉายธรรมดา", "เครื่องซักผ้าแบบมือหมุน", "เครื่องปรับอากาศแบบกดปุ่มธรรมดา"], "a": 0, "exp": "ระบบแนะนำวิดีโอที่ควรดูต่อในแอปดูวิดีโอ เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "การกลั่นแกล้งผู้อื่นทางออนไลน์ เช่น การด่าทอหรือล้อเลียนในโซเชียลมีเดีย เรียกว่าอะไร?", "c": ["การรังแกทางไซเบอร์ (Cyberbullying)", "การตลาดออนไลน์", "การเข้ารหัสข้อมูล", "การอัปเดตซอฟต์แวร์"], "a": 0, "exp": "การกลั่นแกล้งผู้อื่นทางออนไลน์เรียกว่า การรังแกทางไซเบอร์ (Cyberbullying)", "lvl": "easy", "cat": "safety"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอเบอร์โทรศัพท์จากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".or.th\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["องค์กรไม่แสวงหากำไรของไทย", "บริษัทธุรกิจที่จดทะเบียนในไทย", "องค์กรไม่แสวงหากำไรระดับสากล", "องค์กรที่เกี่ยวข้องกับโครงสร้างเครือข่ายอินเทอร์เน็ต"], "a": 0, "exp": "โดเมน \".or.th\" มักใช้กับองค์กรไม่แสวงหากำไรของไทย จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Adobe Photoshop", "Mozilla Firefox", "Brave", "Safari"], "a": 0, "exp": "Adobe Photoshop เป็นโปรแกรมสำหรับตกแต่งและแก้ไขภาพถ่าย ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Yahoo Search", "Windows Media Player", "เครื่องคิดเลข (Calculator)", "Microsoft PowerPoint"], "a": 0, "exp": "Yahoo Search เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"ดอกไม้ประจำชาติ\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"ดอกไม้ประจำชาติ\" (ใส่เครื่องหมายคำพูดครอบ)", "ดอกไม้ป+ระจำชาติ", "ดอกไม้ประจำชาติ OR คำอื่น", "ดอกไม้ประจำชาติ -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"ดอกไม้ประจำชาติ\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ระบบแปลภาษาอัตโนมัติ (เช่น Google Translate)", "พัดลมตั้งโต๊ะ", "นาฬิกาปลุกธรรมดา", "เครื่องปรับอากาศแบบกดปุ่มธรรมดา"], "a": 0, "exp": "ระบบแปลภาษาอัตโนมัติ (เช่น Google Translate) เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอชื่อโรงเรียนที่กำลังเรียนอยู่จากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}], [{"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".co.th\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["บริษัทธุรกิจที่จดทะเบียนในไทย", "เว็บไซต์ที่ให้ข้อมูลทั่วไป", "องค์กรที่เกี่ยวข้องกับโครงสร้างเครือข่ายอินเทอร์เน็ต", "องค์กรไม่แสวงหากำไรระดับสากล"], "a": 0, "exp": "โดเมน \".co.th\" มักใช้กับบริษัทธุรกิจที่จดทะเบียนในไทย จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Windows Media Player", "Vivaldi", "Google Chrome", "Mozilla Firefox"], "a": 0, "exp": "Windows Media Player เป็นโปรแกรมสำหรับเล่นไฟล์เพลงและวิดีโอ ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["DuckDuckGo", "โน้ตแพด (Notepad)", "Windows Media Player", "แอปไลน์ (LINE)"], "a": 0, "exp": "DuckDuckGo เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"อาหารไทยโบราณ\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"อาหารไทยโบราณ\" (ใส่เครื่องหมายคำพูดครอบ)", "อาหารไ+ทยโบราณ", "อาหารไทยโบราณ OR คำอื่น", "อาหารไทยโบราณ -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"อาหารไทยโบราณ\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ระบบกรองอีเมลสแปม (Spam Filter)", "นาฬิกาปลุกธรรมดา", "พัดลมตั้งโต๊ะ", "ไฟฉายธรรมดา"], "a": 0, "exp": "ระบบกรองอีเมลสแปม (Spam Filter) เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอรหัสผ่านบัญชีต่าง ๆจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".edu\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["สถาบันการศึกษาในต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา)", "หน่วยงานรัฐบาลต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา)", "องค์กรไม่แสวงหากำไรของไทย", "หน่วยงานราชการไทย"], "a": 0, "exp": "โดเมน \".edu\" มักใช้กับสถาบันการศึกษาในต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา) จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Notepad (โน้ตแพด)", "Vivaldi", "Google Chrome", "Safari"], "a": 0, "exp": "Notepad (โน้ตแพด) เป็นโปรแกรมสำหรับพิมพ์ข้อความธรรมดาแบบง่าย ๆ ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Google", "Microsoft PowerPoint", "Adobe Photoshop", "Microsoft Word"], "a": 0, "exp": "Google เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"โรงเรียนประถมศึกษา\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"โรงเรียนประถมศึกษา\" (ใส่เครื่องหมายคำพูดครอบ)", "โรงเรียนป+ระถมศึกษา", "โรงเรียนประถมศึกษา OR คำอื่น", "โรงเรียนประถมศึกษา -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"โรงเรียนประถมศึกษา\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}], [{"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["รถยนต์ไร้คนขับ (Self-driving car)", "วิทยุ AM/FM ทั่วไป", "พัดลมตั้งโต๊ะ", "เตารีดไฟฟ้า"], "a": 0, "exp": "รถยนต์ไร้คนขับ (Self-driving car) เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอรูปถ่ายบัตรประชาชนจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".gov\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["หน่วยงานรัฐบาลต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา)", "องค์กรไม่แสวงหากำไรของไทย", "หน่วยงานทางทหารของต่างประเทศ", "หน่วยงานราชการไทย"], "a": 0, "exp": "โดเมน \".gov\" มักใช้กับหน่วยงานรัฐบาลต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา) จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["Microsoft PowerPoint", "Microsoft Edge", "Safari", "Google Chrome"], "a": 0, "exp": "Microsoft PowerPoint เป็นโปรแกรมสำหรับสร้างงานนำเสนอแบบสไลด์ ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Bing", "โปรแกรม Paint", "Adobe Photoshop", "Windows Media Player"], "a": 0, "exp": "Bing เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"วันเด็กแห่งชาติ\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"วันเด็กแห่งชาติ\" (ใส่เครื่องหมายคำพูดครอบ)", "วันเด็ก+แห่งชาติ", "วันเด็กแห่งชาติ OR คำอื่น", "วันเด็กแห่งชาติ -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"วันเด็กแห่งชาติ\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["แชทบอทที่ตอบคำถามลูกค้าอัตโนมัติ", "เครื่องปรับอากาศแบบกดปุ่มธรรมดา", "เครื่องพิมพ์เอกสาร", "เครื่องคิดเลขธรรมดา"], "a": 0, "exp": "แชทบอทที่ตอบคำถามลูกค้าอัตโนมัติ เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอตารางเรียนประจำวันจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".org\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["องค์กรไม่แสวงหากำไรระดับสากล", "หน่วยงานราชการไทย", "สถาบันการศึกษาในประเทศไทย", "บริษัทธุรกิจที่จดทะเบียนในไทย"], "a": 0, "exp": "โดเมน \".org\" มักใช้กับองค์กรไม่แสวงหากำไรระดับสากล จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["โปรแกรม Paint", "Mozilla Firefox", "Opera", "Safari"], "a": 0, "exp": "โปรแกรม Paint เป็นโปรแกรมสำหรับวาดภาพและตกแต่งภาพอย่างง่าย ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}], [{"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["Yahoo Search", "เครื่องคิดเลข (Calculator)", "Windows Media Player", "โปรแกรม Zoom"], "a": 0, "exp": "Yahoo Search เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"สวนสัตว์เชียงใหม่\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"สวนสัตว์เชียงใหม่\" (ใส่เครื่องหมายคำพูดครอบ)", "สวนสัตว์+เชียงใหม่", "สวนสัตว์เชียงใหม่ OR คำอื่น", "สวนสัตว์เชียงใหม่ -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"สวนสัตว์เชียงใหม่\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ระบบจดจำใบหน้าเพื่อปลดล็อกโทรศัพท์", "เตารีดไฟฟ้า", "เครื่องพิมพ์เอกสาร", "เครื่องซักผ้าแบบมือหมุน"], "a": 0, "exp": "ระบบจดจำใบหน้าเพื่อปลดล็อกโทรศัพท์ เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอที่อยู่บ้านของญาติจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".mil\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["หน่วยงานทางทหารของต่างประเทศ", "องค์กรไม่แสวงหากำไรระดับสากล", "สถาบันการศึกษาในต่างประเทศ (ส่วนใหญ่สหรัฐอเมริกา)", "บริษัทธุรกิจที่จดทะเบียนในไทย"], "a": 0, "exp": "โดเมน \".mil\" มักใช้กับหน่วยงานทางทหารของต่างประเทศ จึงเป็นคำตอบที่ถูกต้องที่สุด", "lvl": "easy", "cat": "browser"}, {"q": "โปรแกรมใดต่อไปนี้ \"ไม่ใช่\" เว็บเบราว์เซอร์?", "c": ["เครื่องคิดเลข (Calculator)", "Mozilla Firefox", "Brave", "Microsoft Edge"], "a": 0, "exp": "เครื่องคิดเลข (Calculator) เป็นโปรแกรมสำหรับคำนวณตัวเลขทางคณิตศาสตร์ ไม่ใช่เว็บเบราว์เซอร์ ส่วนตัวเลือกอื่นล้วนเป็นเว็บเบราว์เซอร์ที่ใช้เปิดเว็บไซต์", "lvl": "easy", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่างของเครื่องมือค้นหา (Search Engine)?", "c": ["DuckDuckGo", "โปรแกรม Zoom", "Adobe Photoshop", "เครื่องคิดเลข (Calculator)"], "a": 0, "exp": "DuckDuckGo เป็นเครื่องมือค้นหาที่ช่วยค้นหาข้อมูลหรือเว็บไซต์บนอินเทอร์เน็ต ส่วนตัวเลือกอื่นไม่ใช่เครื่องมือค้นหา", "lvl": "easy", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาคำว่า \"ทะเลอันดามัน\" แบบต้องการให้ปรากฏคำนี้ติดกันเป๊ะ ๆ ควรพิมพ์อย่างไร?", "c": ["\"ทะเลอันดามัน\" (ใส่เครื่องหมายคำพูดครอบ)", "ทะเลอั+นดามัน", "ทะเลอันดามัน OR คำอื่น", "ทะเลอันดามัน -คำอื่น"], "a": 0, "exp": "การใส่เครื่องหมายคำพูดครอบคำหรือวลี เช่น \"ทะเลอันดามัน\" จะทำให้ระบบค้นหาคำนั้นตรงตัวติดกันเป๊ะ ๆ ไม่แยกคำ", "lvl": "easy", "cat": "advanced"}, {"q": "ข้อใดคือตัวอย่างการใช้งาน AI (ปัญญาประดิษฐ์) ในชีวิตประจำวัน?", "c": ["ระบบพิมพ์ข้อความเดาคำอัตโนมัติ (Predictive text)", "เครื่องซักผ้าแบบมือหมุน", "นาฬิกาปลุกธรรมดา", "พัดลมตั้งโต๊ะ"], "a": 0, "exp": "ระบบพิมพ์ข้อความเดาคำอัตโนมัติ (Predictive text) เป็นเทคโนโลยี AI ที่เรียนรู้และวิเคราะห์ข้อมูลเพื่อทำงานให้เหมาะกับผู้ใช้ ส่วนตัวเลือกอื่นเป็นอุปกรณ์ธรรมดาที่ไม่ใช้ AI", "lvl": "easy", "cat": "ai"}, {"q": "ถ้ามีคนแปลกหน้าทางออนไลน์ขอเลขบัญชีธนาคารจากนักเรียน นักเรียนควรทำอย่างไร?", "c": ["ปฏิเสธและไม่ให้ข้อมูลส่วนตัว แล้วบอกผู้ปกครองหรือครู", "ให้ข้อมูลไปทันทีเพราะเป็นเรื่องปกติที่ทำได้", "นัดเจอคนแปลกหน้าคนนั้นทันทีเพื่อพิสูจน์ตัวตน", "ลบแอปพลิเคชันทิ้งโดยไม่บอกใครเลย"], "a": 0, "exp": "ไม่ควรให้ข้อมูลส่วนตัวกับคนแปลกหน้าทางออนไลน์ ควรปฏิเสธและแจ้งผู้ปกครองหรือครูให้ทราบทันที", "lvl": "easy", "cat": "safety"}], [{"q": "\"แถบที่อยู่\" หรือ Address Bar ในเว็บเบราว์เซอร์ใช้สำหรับทำอะไร?", "c": ["พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชม", "แสดงจำนวนแท็บที่เปิดอยู่ทั้งหมด", "ใช้ดาวน์โหลดไฟล์โดยตรง", "ใช้เปลี่ยนธีมสีของเบราว์เซอร์"], "a": 0, "exp": "แถบที่อยู่ใช้พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชมอยู่", "lvl": "medium", "cat": "browser"}, {"q": "ฟีเจอร์ \"บุ๊กมาร์ก (Bookmark)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["บันทึกเว็บไซต์ที่ชอบไว้ เพื่อกลับมาเปิดดูภายหลังโดยไม่ต้องค้นหาใหม่", "เพิ่มความสามารถพิเศษให้เบราว์เซอร์ เช่น ตัวบล็อกโฆษณา", "ไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก"], "a": 0, "exp": "ฟีเจอร์ \"บุ๊กมาร์ก (Bookmark)\" ใช้เพื่อบันทึกเว็บไซต์ที่ชอบไว้ เพื่อกลับมาเปิดดูภายหลังโดยไม่ต้องค้นหาใหม่", "lvl": "medium", "cat": "browser"}, {"q": "เว็บไซต์ที่มีนามสกุลโดเมน \".ac.th\" มักหมายถึงเว็บไซต์ประเภทใด?", "c": ["สถาบันการศึกษาในประเทศไทย", "หน่วยงานราชการไทย", "องค์กรไม่แสวงหากำไร", "บริษัทธุรกิจทั่วไป"], "a": 0, "exp": "โดเมน \".ac.th\" มักใช้กับสถาบันการศึกษาในประเทศไทย", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"ปุ่มรีเฟรช (Refresh/Reload)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["โหลดหน้าเว็บไซต์เดิมใหม่อีกครั้ง", "เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม", "เปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม", "กลับไปยังหน้าเว็บก่อนหน้าที่เพิ่งดู"], "a": 0, "exp": "ฟังก์ชัน \"ปุ่มรีเฟรช (Refresh/Reload)\" ใช้เพื่อโหลดหน้าเว็บไซต์เดิมใหม่อีกครั้ง", "lvl": "medium", "cat": "browser"}, {"q": "ถ้าต้องการบันทึกเว็บไซต์ที่ชอบไว้เพื่อกลับมาดูภายหลังโดยไม่ต้องพิมพ์ค้นหาใหม่ ควรใช้ฟีเจอร์ใดของเบราว์เซอร์?", "c": ["บุ๊กมาร์ก (Bookmark)", "ประวัติการค้นหา (History)", "โหมดไม่ระบุตัวตน (Incognito)", "ตัวจัดการดาวน์โหลด"], "a": 0, "exp": "บุ๊กมาร์กใช้บันทึกเว็บไซต์ที่ชอบไว้เพื่อกลับมาดูภายหลังได้สะดวก", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:wikipedia.org ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ wikipedia.org เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:wikipedia.org จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ wikipedia.org เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "เมื่อค้นหาข้อมูลแล้วพบผลลัพธ์จำนวนมาก วิธีใดช่วยให้เลือกเว็บไซต์ที่น่าเชื่อถือได้ดีที่สุด?", "c": ["อ่านชื่อเว็บไซต์ คำอธิบายสั้น ๆ และพิจารณาแหล่งที่มาก่อนคลิกเข้าไป", "คลิกผลลัพธ์แรกสุดเสมอโดยไม่ต้องอ่านอะไร", "เลือกเว็บไซต์ที่มีโฆษณาเยอะที่สุด", "เลือกเว็บไซต์ที่ชื่อยาวที่สุด"], "a": 0, "exp": "ควรอ่านชื่อเว็บไซต์ คำอธิบายสั้น ๆ และพิจารณาแหล่งที่มาก่อนคลิกเข้าไป เพื่อให้ได้ข้อมูลที่น่าเชื่อถือ", "lvl": "medium", "cat": "browser"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท pdf ที่เกี่ยวกับ \"ระบบสุริยะ\" ควรใช้คำค้นแบบใด?", "c": ["ระบบสุริยะ filetype:pdf", "ระบบสุริยะ \"pdf\"", "ระบบสุริยะ -pdf", "ระบบสุริยะ OR pdf"], "a": 0, "exp": "คำสั่ง filetype:pdf ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท pdf ดังนั้นต้องพิมพ์ \"ระบบสุริยะ filetype:pdf\"", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"แพนด้า\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"การ์ตูน\" ควรพิมพ์คำค้นอย่างไร?", "c": ["แพนด้า -การ์ตูน", "แพนด้า +การ์ตูน", "แพนด้า OR การ์ตูน", "\"แพนด้าการ์ตูน\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำ ใช้เพื่อยกเว้นคำนั้นออกจากผลการค้นหา", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"แพนด้า\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"การ์ตูน\" ควรพิมพ์คำค้นอย่างไร?", "c": ["แพนด้า -การ์ตูน", "แพนด้า +การ์ตูน", "แพนด้า OR การ์ตูน", "\"แพนด้าการ์ตูน\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"แพนด้า -การ์ตูน\"", "lvl": "medium", "cat": "advanced"}], [{"q": "เครื่องหมายลบ (-) หน้าคำค้น มีความหมายว่าอย่างไรในการค้นหา?", "c": ["ต้องการยกเว้นหรือไม่ต้องการให้ผลลัพธ์มีคำนั้นปรากฏอยู่", "ต้องการให้ผลลัพธ์มีคำนั้นแน่นอนทุกครั้ง", "ทำให้ค้นหาเฉพาะรูปภาพเท่านั้น", "ทำให้ค้นหาเฉพาะวิดีโอเท่านั้น"], "a": 0, "exp": "เครื่องหมายลบ (-) หมายถึงต้องการยกเว้นหรือไม่ต้องการให้ผลลัพธ์มีคำนั้นปรากฏอยู่", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด ระบบกรองอีเมลสแปม จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ระบบกรองอีเมลสแปม เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท PDF ที่เกี่ยวกับ \"ระบบสุริยะ\" ควรใช้คำค้นแบบใด?", "c": ["ระบบสุริยะ filetype:pdf", "ระบบสุริยะ \"pdf\"", "ระบบสุริยะ -pdf", "ระบบสุริยะ OR pdf"], "a": 0, "exp": "คำสั่ง filetype:pdf ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท PDF", "lvl": "medium", "cat": "advanced"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"รถยนต์ไร้คนขับ\"?", "c": ["ช่วยวิเคราะห์สภาพแวดล้อมรอบตัวรถแล้วตัดสินใจควบคุมรถได้เองโดยอัตโนมัติ", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในรถยนต์ไร้คนขับ เทคโนโลยี AI ถูกนำมาใช้เพื่อช่วยวิเคราะห์สภาพแวดล้อมรอบตัวรถแล้วตัดสินใจควบคุมรถได้เองโดยอัตโนมัติ", "lvl": "medium", "cat": "ai"}, {"q": "คำสั่ง site: ในการค้นหา (เช่น พิมพ์ site:wikipedia.org ตามด้วยคำค้น) มีประโยชน์อย่างไร?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์นั้นเท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหา"], "a": 0, "exp": "คำสั่ง site: ใช้จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ที่ระบุเท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในโซเชียลมีเดีย ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อใดอธิบายความหมายของ \"ปัญญาประดิษฐ์ (AI)\" ได้ถูกต้องที่สุด?", "c": ["เทคโนโลยีที่ทำให้คอมพิวเตอร์สามารถเรียนรู้และตัดสินใจได้คล้ายมนุษย์ในบางเรื่อง", "โปรแกรมที่ทำงานตามคำสั่งตายตัวเพียงอย่างเดียวเท่านั้น ไม่เปลี่ยนแปลง", "อุปกรณ์คอมพิวเตอร์ที่มีขนาดเล็กที่สุดในโลก", "ชื่อของเว็บไซต์ค้นหาข้อมูลแห่งหนึ่ง"], "a": 0, "exp": "AI คือเทคโนโลยีที่ทำให้คอมพิวเตอร์สามารถเรียนรู้และตัดสินใจได้คล้ายมนุษย์ในบางเรื่อง", "lvl": "medium", "cat": "ai"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"ได้รับรางวัลใหญ่จากการจับฉลาก\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "ข้อใดคือข้อจำกัดของปัญญาประดิษฐ์ (AI) ในปัจจุบัน?", "c": ["AI อาจให้คำตอบผิดพลาดได้หากข้อมูลที่เรียนรู้มาไม่ถูกต้องหรือไม่เพียงพอ", "AI ทำงานถูกต้อง 100% เสมอไม่มีข้อผิดพลาด", "AI สามารถเข้าใจความรู้สึกมนุษย์ได้อย่างสมบูรณ์แบบทุกครั้ง", "AI ไม่จำเป็นต้องใช้ข้อมูลใด ๆ ในการทำงาน"], "a": 0, "exp": "AI อาจให้คำตอบผิดพลาดได้หากข้อมูลที่เรียนรู้มาไม่ถูกต้องหรือไม่เพียงพอ", "lvl": "medium", "cat": "ai"}, {"q": "เพราะเหตุใดการ \"ตั้งรหัสผ่านที่คาดเดายาก โดยผสมตัวอักษร ตัวเลข และสัญลักษณ์\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะรหัสผ่านที่คาดเดายากจะทำให้ผู้ไม่หวังดีเข้าถึงบัญชีของเราได้ยากขึ้น", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ตั้งรหัสผ่านที่คาดเดายาก โดยผสมตัวอักษร ตัวเลข และสัญลักษณ์\" สำคัญเพราะรหัสผ่านที่คาดเดายากจะทำให้ผู้ไม่หวังดีเข้าถึงบัญชีของเราได้ยากขึ้น", "lvl": "medium", "cat": "safety"}], [{"q": "แอปพลิเคชันแปลภาษาอัตโนมัติ เช่น Google Translate ใช้เทคโนโลยีใดในการทำงาน?", "c": ["ปัญญาประดิษฐ์ที่เรียนรู้จากข้อมูลภาษาจำนวนมาก", "สัญญาณดาวเทียม GPS", "เซ็นเซอร์วัดอุณหภูมิ", "บลูทูธ (Bluetooth)"], "a": 0, "exp": "แอปแปลภาษาใช้ปัญญาประดิษฐ์ที่เรียนรู้จากข้อมูลภาษาจำนวนมาก", "lvl": "medium", "cat": "ai"}, {"q": "ฟีเจอร์ \"ประวัติการเข้าชม (History)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["แสดงรายชื่อเว็บไซต์ที่เคยเข้าชมย้อนหลัง", "ตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น", "แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "ใช้พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชมอยู่"], "a": 0, "exp": "ฟีเจอร์ \"ประวัติการเข้าชม (History)\" ใช้เพื่อแสดงรายชื่อเว็บไซต์ที่เคยเข้าชมย้อนหลัง", "lvl": "medium", "cat": "browser"}, {"q": "ข้อใดคือตัวอย่าง AI ที่ช่วยกรองข้อความไม่พึงประสงค์ในกล่องข้อความหรืออีเมล?", "c": ["ระบบกรองสแปม (Spam Filter)", "โปรแกรมเล่นเพลง", "เครื่องปรับอากาศ", "นาฬิกาปลุก"], "a": 0, "exp": "ระบบกรองสแปมเป็นตัวอย่างของ AI ที่ช่วยกรองข้อความไม่พึงประสงค์", "lvl": "medium", "cat": "ai"}, {"q": "ฟังก์ชัน \"ปุ่มย้อนกลับ (Back)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["กลับไปยังหน้าเว็บก่อนหน้าที่เพิ่งดู", "ไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว", "เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม", "เปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม"], "a": 0, "exp": "ฟังก์ชัน \"ปุ่มย้อนกลับ (Back)\" ใช้เพื่อกลับไปยังหน้าเว็บก่อนหน้าที่เพิ่งดู", "lvl": "medium", "cat": "browser"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "ควรบอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "lvl": "medium", "cat": "safety"}, {"q": "การพิมพ์ site:go.th ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ go.th เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:go.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ go.th เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ข้อความหรืออีเมลที่อ้างว่านักเรียนถูกรางวัลใหญ่และขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยเสมอ", "ระบบแจ้งเตือนจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตราย"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "lvl": "medium", "cat": "safety"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท docx ที่เกี่ยวกับ \"ประวัติศาสตร์ไทย\" ควรใช้คำค้นแบบใด?", "c": ["ประวัติศาสตร์ไทย filetype:docx", "ประวัติศาสตร์ไทย \"docx\"", "ประวัติศาสตร์ไทย -docx", "ประวัติศาสตร์ไทย OR docx"], "a": 0, "exp": "คำสั่ง filetype:docx ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท docx ดังนั้นต้องพิมพ์ \"ประวัติศาสตร์ไทย filetype:docx\"", "lvl": "medium", "cat": "advanced"}, {"q": "ก่อนแชร์ข่าวหรือข้อมูลที่พบในอินเทอร์เน็ตต่อให้ผู้อื่น นักเรียนควรทำอย่างไร?", "c": ["ตรวจสอบความถูกต้องจากแหล่งข้อมูลที่น่าเชื่อถือก่อนแชร์", "แชร์ทันทีโดยไม่ต้องตรวจสอบเพราะเสียเวลา", "แชร์เฉพาะข่าวที่มีรูปภาพสวยงามเท่านั้น", "แชร์เฉพาะข่าวที่เพื่อนสนิทส่งมาโดยไม่ต้องตรวจสอบ"], "a": 0, "exp": "ควรตรวจสอบความถูกต้องจากแหล่งข้อมูลที่น่าเชื่อถือก่อนแชร์เสมอ", "lvl": "medium", "cat": "safety"}, {"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"จากัวร์\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"รถยนต์\" ควรพิมพ์คำค้นอย่างไร?", "c": ["จากัวร์ -รถยนต์", "จากัวร์ +รถยนต์", "จากัวร์ OR รถยนต์", "\"จากัวร์รถยนต์\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"จากัวร์ -รถยนต์\"", "lvl": "medium", "cat": "advanced"}], [{"q": "มารยาทที่ดีในการสื่อสารออนไลน์ (Netiquette) ควรเป็นอย่างไร?", "c": ["ใช้คำพูดสุภาพ ให้เกียรติผู้อื่น และไม่พิมพ์ตัวใหญ่ทั้งหมดซึ่งดูเหมือนตะโกนใส่", "พิมพ์ด่าทอผู้อื่นได้ถ้าไม่พอใจ", "ใช้ชื่อปลอมเพื่อกลั่นแกล้งคนอื่นได้อย่างอิสระ", "เผยแพร่ข้อมูลส่วนตัวของเพื่อนโดยไม่ขออนุญาต"], "a": 0, "exp": "มารยาทที่ดีในการสื่อสารออนไลน์ คือใช้คำพูดสุภาพ ให้เกียรติผู้อื่น และไม่พิมพ์ตัวใหญ่ทั้งหมดซึ่งดูเหมือนตะโกนใส่", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใด ระบบแปลภาษาอัตโนมัติ จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ระบบแปลภาษาอัตโนมัติ เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การพยากรณ์อากาศ\"?", "c": ["วิเคราะห์ข้อมูลสภาพอากาศจำนวนมากเพื่อคาดการณ์แนวโน้มได้แม่นยำขึ้น", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการพยากรณ์อากาศ เทคโนโลยี AI ถูกนำมาใช้เพื่อวิเคราะห์ข้อมูลสภาพอากาศจำนวนมากเพื่อคาดการณ์แนวโน้มได้แม่นยำขึ้น", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในเกมออนไลน์ ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"บัญชีถูกระงับต้องยืนยันตัวตนด่วน\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"ไม่บอกรหัสผ่านของตัวเองให้เพื่อนหรือคนอื่นรู้\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะหากรหัสผ่านรั่วไหล ผู้อื่นอาจนำไปใช้สวมรอยหรือสร้างความเสียหายให้เราได้", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ไม่บอกรหัสผ่านของตัวเองให้เพื่อนหรือคนอื่นรู้\" สำคัญเพราะหากรหัสผ่านรั่วไหล ผู้อื่นอาจนำไปใช้สวมรอยหรือสร้างความเสียหายให้เราได้", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"โหมดไม่ระบุตัวตน (Incognito/Private)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["ไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "ปรับขนาดตัวอักษรและภาพบนหน้าเว็บให้ใหญ่หรือเล็กลง", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก", "แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต"], "a": 0, "exp": "ฟีเจอร์ \"โหมดไม่ระบุตัวตน (Incognito/Private)\" ใช้เพื่อไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"ปุ่มไปข้างหน้า (Forward)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["ไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว", "ปิดเฉพาะแท็บที่กำลังเปิดอยู่ โดยแท็บอื่นยังเปิดอยู่เหมือนเดิม", "ขยายตัวอักษรและภาพบนหน้าเว็บให้ใหญ่ขึ้น", "เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม"], "a": 0, "exp": "ฟังก์ชัน \"ปุ่มไปข้างหน้า (Forward)\" ใช้เพื่อไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:ac.th ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ ac.th เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:ac.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ ac.th เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท pptx ที่เกี่ยวกับ \"สูตรคณิตศาสตร์\" ควรใช้คำค้นแบบใด?", "c": ["สูตรคณิตศาสตร์ filetype:pptx", "สูตรคณิตศาสตร์ \"pptx\"", "สูตรคณิตศาสตร์ -pptx", "สูตรคณิตศาสตร์ OR pptx"], "a": 0, "exp": "คำสั่ง filetype:pptx ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท pptx ดังนั้นต้องพิมพ์ \"สูตรคณิตศาสตร์ filetype:pptx\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"แอปเปิล\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"บริษัท\" ควรพิมพ์คำค้นอย่างไร?", "c": ["แอปเปิล -บริษัท", "แอปเปิล +บริษัท", "แอปเปิล OR บริษัท", "\"แอปเปิลบริษัท\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"แอปเปิล -บริษัท\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด แชทบอทตอบคำถาม จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "แชทบอทตอบคำถาม เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การซื้อขายหุ้นอัตโนมัติ\"?", "c": ["วิเคราะห์แนวโน้มตลาดจากข้อมูลจำนวนมากเพื่อช่วยตัดสินใจซื้อขาย", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการซื้อขายหุ้นอัตโนมัติ เทคโนโลยี AI ถูกนำมาใช้เพื่อวิเคราะห์แนวโน้มตลาดจากข้อมูลจำนวนมากเพื่อช่วยตัดสินใจซื้อขาย", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในแอปแชท ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"ได้รับเงินคืนภาษีจำนวนมาก\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"เปิดใช้การยืนยันตัวตนสองขั้นตอน (2FA)\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะเป็นการเพิ่มชั้นความปลอดภัย แม้รหัสผ่านรั่วไหลก็ยังต้องยืนยันตัวตนอีกขั้นก่อนเข้าบัญชีได้", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"เปิดใช้การยืนยันตัวตนสองขั้นตอน (2FA)\" สำคัญเพราะเป็นการเพิ่มชั้นความปลอดภัย แม้รหัสผ่านรั่วไหลก็ยังต้องยืนยันตัวตนอีกขั้นก่อนเข้าบัญชีได้", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"แถบที่อยู่ (Address Bar)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["ใช้พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชมอยู่", "แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "แสดงรายชื่อเว็บไซต์ที่เคยเข้าชมย้อนหลัง", "ปรับขนาดตัวอักษรและภาพบนหน้าเว็บให้ใหญ่หรือเล็กลง"], "a": 0, "exp": "ฟีเจอร์ \"แถบที่อยู่ (Address Bar)\" ใช้เพื่อใช้พิมพ์หรือแสดง URL ของเว็บไซต์ที่กำลังเข้าชมอยู่", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"เปิดแท็บใหม่ (New Tab)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["เปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม", "สั่งพิมพ์เนื้อหาของหน้าเว็บที่กำลังแสดงอยู่ออกทางเครื่องพิมพ์", "โหลดหน้าเว็บไซต์เดิมใหม่อีกครั้ง", "เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม"], "a": 0, "exp": "ฟังก์ชัน \"เปิดแท็บใหม่ (New Tab)\" ใช้เพื่อเปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:youtube.com ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ youtube.com เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:youtube.com จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ youtube.com เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท xlsx ที่เกี่ยวกับ \"งบประมาณโรงเรียน\" ควรใช้คำค้นแบบใด?", "c": ["งบประมาณโรงเรียน filetype:xlsx", "งบประมาณโรงเรียน \"xlsx\"", "งบประมาณโรงเรียน -xlsx", "งบประมาณโรงเรียน OR xlsx"], "a": 0, "exp": "คำสั่ง filetype:xlsx ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท xlsx ดังนั้นต้องพิมพ์ \"งบประมาณโรงเรียน filetype:xlsx\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"งูเห่า\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"วงดนตรี\" ควรพิมพ์คำค้นอย่างไร?", "c": ["งูเห่า -วงดนตรี", "งูเห่า +วงดนตรี", "งูเห่า OR วงดนตรี", "\"งูเห่าวงดนตรี\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"งูเห่า -วงดนตรี\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด ระบบแนะนำวิดีโอ/สินค้า จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ระบบแนะนำวิดีโอ/สินค้า เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การแปลภาษา\"?", "c": ["เรียนรู้จากข้อมูลภาษาจำนวนมากเพื่อแปลข้อความได้อย่างเป็นธรรมชาติมากขึ้น", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการแปลภาษา เทคโนโลยี AI ถูกนำมาใช้เพื่อเรียนรู้จากข้อมูลภาษาจำนวนมากเพื่อแปลข้อความได้อย่างเป็นธรรมชาติมากขึ้น", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในห้องเรียนออนไลน์ ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"มีพัสดุตกค้างต้องจ่ายเงินเพิ่ม\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"ไม่ใช้รหัสผ่านเดียวกันซ้ำกับทุกเว็บไซต์\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะถ้าเว็บใดเว็บหนึ่งถูกแฮก บัญชีอื่น ๆ ที่ใช้รหัสเดียวกันก็จะเสี่ยงถูกเข้าถึงไปด้วย", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ไม่ใช้รหัสผ่านเดียวกันซ้ำกับทุกเว็บไซต์\" สำคัญเพราะถ้าเว็บใดเว็บหนึ่งถูกแฮก บัญชีอื่น ๆ ที่ใช้รหัสเดียวกันก็จะเสี่ยงถูกเข้าถึงไปด้วย", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"แท็บ (Tab)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก", "ไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "ตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น"], "a": 0, "exp": "ฟีเจอร์ \"แท็บ (Tab)\" ใช้เพื่อเปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"ปิดแท็บ (Close Tab)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["ปิดเฉพาะแท็บที่กำลังเปิดอยู่ โดยแท็บอื่นยังเปิดอยู่เหมือนเดิม", "ขยายหน้าต่างเบราว์เซอร์ให้เต็มหน้าจอ ซ่อนแถบเครื่องมือต่าง ๆ", "เปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม", "ไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว"], "a": 0, "exp": "ฟังก์ชัน \"ปิดแท็บ (Close Tab)\" ใช้เพื่อปิดเฉพาะแท็บที่กำลังเปิดอยู่ โดยแท็บอื่นยังเปิดอยู่เหมือนเดิม", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:pantip.com ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ pantip.com เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:pantip.com จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ pantip.com เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท jpg ที่เกี่ยวกับ \"แผนที่ประเทศไทย\" ควรใช้คำค้นแบบใด?", "c": ["แผนที่ประเทศไทย filetype:jpg", "แผนที่ประเทศไทย \"jpg\"", "แผนที่ประเทศไทย -jpg", "แผนที่ประเทศไทย OR jpg"], "a": 0, "exp": "คำสั่ง filetype:jpg ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท jpg ดังนั้นต้องพิมพ์ \"แผนที่ประเทศไทย filetype:jpg\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"ไวรัส\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"คอมพิวเตอร์\" ควรพิมพ์คำค้นอย่างไร?", "c": ["ไวรัส -คอมพิวเตอร์", "ไวรัส +คอมพิวเตอร์", "ไวรัส OR คอมพิวเตอร์", "\"ไวรัสคอมพิวเตอร์\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"ไวรัส -คอมพิวเตอร์\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด รถยนต์ไร้คนขับ จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "รถยนต์ไร้คนขับ เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การบริการลูกค้าผ่านแชทบอท\"?", "c": ["ตอบคำถามลูกค้าโดยอัตโนมัติตลอด 24 ชั่วโมงโดยไม่ต้องใช้พนักงาน", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการบริการลูกค้าผ่านแชทบอท เทคโนโลยี AI ถูกนำมาใช้เพื่อตอบคำถามลูกค้าโดยอัตโนมัติตลอด 24 ชั่วโมงโดยไม่ต้องใช้พนักงาน", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในเว็บบอร์ด/ฟอรัม ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"ธนาคารแจ้งเตือนกิจกรรมผิดปกติในบัญชี\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"ออกจากระบบ (Log out) ทุกครั้งที่ใช้คอมพิวเตอร์สาธารณะ\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะหากไม่ออกจากระบบ คนที่ใช้เครื่องต่อจากเราอาจเข้าถึงบัญชีของเราได้", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ออกจากระบบ (Log out) ทุกครั้งที่ใช้คอมพิวเตอร์สาธารณะ\" สำคัญเพราะหากไม่ออกจากระบบ คนที่ใช้เครื่องต่อจากเราอาจเข้าถึงบัญชีของเราได้", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"ส่วนขยาย (Extension/Add-on)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["เพิ่มความสามารถพิเศษให้เบราว์เซอร์ เช่น ตัวบล็อกโฆษณา", "บันทึกเว็บไซต์ที่ชอบไว้ เพื่อกลับมาเปิดดูภายหลังโดยไม่ต้องค้นหาใหม่", "ตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก"], "a": 0, "exp": "ฟีเจอร์ \"ส่วนขยาย (Extension/Add-on)\" ใช้เพื่อเพิ่มความสามารถพิเศษให้เบราว์เซอร์ เช่น ตัวบล็อกโฆษณา", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"เปิดหน้าต่างใหม่ (New Window)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม", "ไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว", "เก็บหน้าเว็บไซต์นั้นไว้ในเครื่องเพื่อเปิดดูภายหลังแม้ไม่ต่ออินเทอร์เน็ต", "โหลดหน้าเว็บไซต์เดิมใหม่อีกครั้ง"], "a": 0, "exp": "ฟังก์ชัน \"เปิดหน้าต่างใหม่ (New Window)\" ใช้เพื่อเปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:sanook.com ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ sanook.com เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:sanook.com จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ sanook.com เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท mp3 ที่เกี่ยวกับ \"เพลงชาติไทย\" ควรใช้คำค้นแบบใด?", "c": ["เพลงชาติไทย filetype:mp3", "เพลงชาติไทย \"mp3\"", "เพลงชาติไทย -mp3", "เพลงชาติไทย OR mp3"], "a": 0, "exp": "คำสั่ง filetype:mp3 ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท mp3 ดังนั้นต้องพิมพ์ \"เพลงชาติไทย filetype:mp3\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"ดาวพฤหัสบดี\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"ภาพยนตร์\" ควรพิมพ์คำค้นอย่างไร?", "c": ["ดาวพฤหัสบดี -ภาพยนตร์", "ดาวพฤหัสบดี +ภาพยนตร์", "ดาวพฤหัสบดี OR ภาพยนตร์", "\"ดาวพฤหัสบดีภาพยนตร์\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"ดาวพฤหัสบดี -ภาพยนตร์\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด ผู้ช่วยเสียงอัจฉริยะ จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ผู้ช่วยเสียงอัจฉริยะ เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การเกษตรแม่นยำ\"?", "c": ["วิเคราะห์ข้อมูลดินและสภาพอากาศเพื่อช่วยวางแผนการเพาะปลูกให้เหมาะสม", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการเกษตรแม่นยำ เทคโนโลยี AI ถูกนำมาใช้เพื่อวิเคราะห์ข้อมูลดินและสภาพอากาศเพื่อช่วยวางแผนการเพาะปลูกให้เหมาะสม", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในช่องคอมเมนต์ใต้วิดีโอ ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"บัญชีถูกแฮกต้องเปลี่ยนรหัสผ่านด่วน\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"ไม่คลิกลิงก์แปลกปลอมที่ส่งมาทางอีเมลหรือข้อความ\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะลิงก์เหล่านั้นอาจนำไปสู่เว็บไซต์ปลอมที่ขโมยข้อมูลส่วนตัวของเรา", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ไม่คลิกลิงก์แปลกปลอมที่ส่งมาทางอีเมลหรือข้อความ\" สำคัญเพราะลิงก์เหล่านั้นอาจนำไปสู่เว็บไซต์ปลอมที่ขโมยข้อมูลส่วนตัวของเรา", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"ตัวจัดการดาวน์โหลด (Download Manager)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "บันทึกเว็บไซต์ที่ชอบไว้ เพื่อกลับมาเปิดดูภายหลังโดยไม่ต้องค้นหาใหม่", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก", "แสดงรายชื่อเว็บไซต์ที่เคยเข้าชมย้อนหลัง"], "a": 0, "exp": "ฟีเจอร์ \"ตัวจัดการดาวน์โหลด (Download Manager)\" ใช้เพื่อแสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"พิมพ์หน้าเว็บ (Print)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["สั่งพิมพ์เนื้อหาของหน้าเว็บที่กำลังแสดงอยู่ออกทางเครื่องพิมพ์", "เปิดหน้าต่างเบราว์เซอร์ใหม่แยกจากหน้าต่างเดิม", "ปิดเฉพาะแท็บที่กำลังเปิดอยู่ โดยแท็บอื่นยังเปิดอยู่เหมือนเดิม", "กลับไปยังหน้าเว็บก่อนหน้าที่เพิ่งดู"], "a": 0, "exp": "ฟังก์ชัน \"พิมพ์หน้าเว็บ (Print)\" ใช้เพื่อสั่งพิมพ์เนื้อหาของหน้าเว็บที่กำลังแสดงอยู่ออกทางเครื่องพิมพ์", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:mahidol.ac.th ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ mahidol.ac.th เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:mahidol.ac.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ mahidol.ac.th เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท csv ที่เกี่ยวกับ \"สถิติประชากร\" ควรใช้คำค้นแบบใด?", "c": ["สถิติประชากร filetype:csv", "สถิติประชากร \"csv\"", "สถิติประชากร -csv", "สถิติประชากร OR csv"], "a": 0, "exp": "คำสั่ง filetype:csv ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท csv ดังนั้นต้องพิมพ์ \"สถิติประชากร filetype:csv\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"มะม่วง\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"ขนม\" ควรพิมพ์คำค้นอย่างไร?", "c": ["มะม่วง -ขนม", "มะม่วง +ขนม", "มะม่วง OR ขนม", "\"มะม่วงขนม\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"มะม่วง -ขนม\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด ระบบจดจำใบหน้า จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ระบบจดจำใบหน้า เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"การตรวจจับการทุจริตทางการเงิน\"?", "c": ["วิเคราะห์รูปแบบการทำธุรกรรมเพื่อตรวจจับความผิดปกติที่อาจเป็นการฉ้อโกง", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในการตรวจจับการทุจริตทางการเงิน เทคโนโลยี AI ถูกนำมาใช้เพื่อวิเคราะห์รูปแบบการทำธุรกรรมเพื่อตรวจจับความผิดปกติที่อาจเป็นการฉ้อโกง", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในกลุ่มไลน์ ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"ได้งานพาร์ทไทม์ที่ให้รายได้ดีมาก\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"อัปเดตซอฟต์แวร์ป้องกันไวรัสอยู่เสมอ\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะช่วยป้องกันมัลแวร์หรือไวรัสรูปแบบใหม่ ๆ ที่อาจเข้ามาโจมตีเครื่องของเรา", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"อัปเดตซอฟต์แวร์ป้องกันไวรัสอยู่เสมอ\" สำคัญเพราะช่วยป้องกันมัลแวร์หรือไวรัสรูปแบบใหม่ ๆ ที่อาจเข้ามาโจมตีเครื่องของเรา", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"การซูม (Zoom)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["ปรับขนาดตัวอักษรและภาพบนหน้าเว็บให้ใหญ่หรือเล็กลง", "แสดงและจัดการไฟล์ที่กำลังหรือเคยดาวน์โหลดมาจากอินเทอร์เน็ต", "ตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก"], "a": 0, "exp": "ฟีเจอร์ \"การซูม (Zoom)\" ใช้เพื่อปรับขนาดตัวอักษรและภาพบนหน้าเว็บให้ใหญ่หรือเล็กลง", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"บันทึกหน้าเว็บ (Save Page)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["เก็บหน้าเว็บไซต์นั้นไว้ในเครื่องเพื่อเปิดดูภายหลังแม้ไม่ต่ออินเทอร์เน็ต", "เปิดหน้าเว็บใหม่ในแท็บเพิ่มเติมโดยไม่ปิดแท็บเดิม", "ปิดเฉพาะแท็บที่กำลังเปิดอยู่ โดยแท็บอื่นยังเปิดอยู่เหมือนเดิม", "โหลดหน้าเว็บไซต์เดิมใหม่อีกครั้ง"], "a": 0, "exp": "ฟังก์ชัน \"บันทึกหน้าเว็บ (Save Page)\" ใช้เพื่อเก็บหน้าเว็บไซต์นั้นไว้ในเครื่องเพื่อเปิดดูภายหลังแม้ไม่ต่ออินเทอร์เน็ต", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:nstda.or.th ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ nstda.or.th เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:nstda.or.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ nstda.or.th เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท txt ที่เกี่ยวกับ \"รายชื่อนักเรียน\" ควรใช้คำค้นแบบใด?", "c": ["รายชื่อนักเรียน filetype:txt", "รายชื่อนักเรียน \"txt\"", "รายชื่อนักเรียน -txt", "รายชื่อนักเรียน OR txt"], "a": 0, "exp": "คำสั่ง filetype:txt ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท txt ดังนั้นต้องพิมพ์ \"รายชื่อนักเรียน filetype:txt\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ถ้าต้องการค้นหาข้อมูลเกี่ยวกับ \"สิงโต\" แต่ไม่ต้องการผลลัพธ์ที่เกี่ยวกับ \"ทีมฟุตบอล\" ควรพิมพ์คำค้นอย่างไร?", "c": ["สิงโต -ทีมฟุตบอล", "สิงโต +ทีมฟุตบอล", "สิงโต OR ทีมฟุตบอล", "\"สิงโตทีมฟุตบอล\""], "a": 0, "exp": "เครื่องหมายลบ (-) หน้าคำใด หมายถึงต้องการยกเว้นคำนั้นออกจากผลการค้นหา ดังนั้นต้องพิมพ์ \"สิงโต -ทีมฟุตบอล\"", "lvl": "medium", "cat": "advanced"}, {"q": "เพราะเหตุใด ระบบพิมพ์ข้อความเดาคำ จึงอาจให้ผลลัพธ์ที่ผิดพลาดได้บ้าง?", "c": ["เพราะระบบเรียนรู้จากข้อมูลที่ป้อนให้ ถ้าข้อมูลไม่ถูกต้องหรือไม่ครอบคลุมพอ ผลลัพธ์ก็อาจผิดพลาดได้", "เพราะระบบทำงานถูกต้อง 100% เสมอ ไม่มีทางผิดพลาด", "เพราะระบบไม่ได้ใช้ข้อมูลใด ๆ ในการทำงานเลย", "เพราะระบบทำงานได้เฉพาะเวลากลางคืนเท่านั้น"], "a": 0, "exp": "ระบบพิมพ์ข้อความเดาคำ เป็น AI ที่เรียนรู้จากข้อมูล หากข้อมูลที่ใช้ฝึกไม่ถูกต้องหรือไม่ครบถ้วน ผลลัพธ์ที่ได้ก็อาจผิดพลาดตามไปด้วย", "lvl": "medium", "cat": "ai"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับ \"กล้องวงจรปิดอัจฉริยะ\"?", "c": ["จดจำใบหน้าหรือพฤติกรรมผิดปกติเพื่อแจ้งเตือนภัยโดยอัตโนมัติ", "ทำให้ค่าใช้จ่ายในการดำเนินงานเป็นศูนย์เสมอ", "ทำให้ไม่ต้องใช้ไฟฟ้าหรือพลังงานใด ๆ เลย", "ทำให้ผลลัพธ์ถูกต้อง 100% โดยไม่มีข้อผิดพลาดเลย"], "a": 0, "exp": "ในกล้องวงจรปิดอัจฉริยะ เทคโนโลยี AI ถูกนำมาใช้เพื่อจดจำใบหน้าหรือพฤติกรรมผิดปกติเพื่อแจ้งเตือนภัยโดยอัตโนมัติ", "lvl": "medium", "cat": "ai"}, {"q": "หากนักเรียนถูกกลั่นแกล้งทางออนไลน์ในแพลตฟอร์ม X (ทวิตเตอร์) ควรทำอย่างไรเป็นอันดับแรก?", "c": ["บอกผู้ปกครองหรือครูที่ไว้ใจได้ทันที และเก็บหลักฐานไว้", "ตอบโต้ด้วยข้อความรุนแรงกลับไปทันที", "เก็บเรื่องไว้คนเดียวไม่บอกใครเลย", "ลบแอปพลิเคชันทั้งหมดในโทรศัพท์ทันที"], "a": 0, "exp": "เมื่อถูกกลั่นแกล้งทางออนไลน์ ควรแจ้งผู้ใหญ่ที่ไว้ใจได้ทันทีและเก็บหลักฐาน (ภาพหน้าจอ) ไว้เพื่อใช้ประกอบการแก้ไขปัญหา", "lvl": "medium", "cat": "safety"}, {"q": "ข้อความหรืออีเมลที่อ้างว่า \"ญาติที่อยู่ต่างประเทศติดต่อขอยืมเงินด่วน\" แล้วขอให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านทันที มักเป็นลักษณะของอะไร?", "c": ["การหลอกลวงแบบฟิชชิง (Phishing) เพื่อขโมยข้อมูล", "ข้อเสนอพิเศษที่ปลอดภัยและน่าเชื่อถือเสมอ", "ระบบแจ้งเตือนอย่างเป็นทางการจากโรงเรียนโดยตรง", "โฆษณาสินค้าทั่วไปที่ไม่มีอันตรายใด ๆ"], "a": 0, "exp": "ข้อความลักษณะนี้มักเป็นการหลอกลวงแบบฟิชชิง (Phishing) ที่ต้องการหลอกให้กรอกข้อมูลส่วนตัวหรือรหัสผ่านเพื่อนำไปใช้ในทางที่ผิด", "lvl": "medium", "cat": "safety"}, {"q": "เพราะเหตุใดการ \"ตรวจสอบการตั้งค่าความเป็นส่วนตัวของบัญชีโซเชียลมีเดียเป็นระยะ\" จึงสำคัญต่อความปลอดภัยในการใช้อินเทอร์เน็ต?", "c": ["เพราะช่วยควบคุมว่าใครบ้างที่จะเห็นข้อมูลส่วนตัวของเราได้", "เพราะทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้นกว่าเดิม", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ แค่ทำตามกันมา", "เพราะทำให้แบตเตอรี่ของอุปกรณ์ใช้งานได้นานขึ้น"], "a": 0, "exp": "การ \"ตรวจสอบการตั้งค่าความเป็นส่วนตัวของบัญชีโซเชียลมีเดียเป็นระยะ\" สำคัญเพราะช่วยควบคุมว่าใครบ้างที่จะเห็นข้อมูลส่วนตัวของเราได้", "lvl": "medium", "cat": "safety"}, {"q": "ฟีเจอร์ \"โหมดอ่านบทความ (Reader Mode)\" ของเว็บเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["ตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น", "บันทึกและจดจำรหัสผ่านของเว็บไซต์ต่าง ๆ ให้ใช้งานสะดวกและปลอดภัยขึ้น", "ไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "เปิดหลายเว็บไซต์พร้อมกันในหน้าต่างเดียว สลับไปมาได้สะดวก"], "a": 0, "exp": "ฟีเจอร์ \"โหมดอ่านบทความ (Reader Mode)\" ใช้เพื่อตัดโฆษณาและองค์ประกอบรบกวนออก ให้อ่านเนื้อหาบทความได้สะดวกขึ้น", "lvl": "medium", "cat": "browser"}, {"q": "ฟังก์ชัน \"ซูมเข้า (Zoom In)\" ในเว็บเบราว์เซอร์ใช้ทำอะไร?", "c": ["ขยายตัวอักษรและภาพบนหน้าเว็บให้ใหญ่ขึ้น", "ขยายหน้าต่างเบราว์เซอร์ให้เต็มหน้าจอ ซ่อนแถบเครื่องมือต่าง ๆ", "ไปยังหน้าเว็บถัดไปหลังจากกดย้อนกลับมาแล้ว", "สั่งพิมพ์เนื้อหาของหน้าเว็บที่กำลังแสดงอยู่ออกทางเครื่องพิมพ์"], "a": 0, "exp": "ฟังก์ชัน \"ซูมเข้า (Zoom In)\" ใช้เพื่อขยายตัวอักษรและภาพบนหน้าเว็บให้ใหญ่ขึ้น", "lvl": "medium", "cat": "browser"}, {"q": "การพิมพ์ site:tistr.or.th ตามด้วยคำค้น มีผลอย่างไรต่อผลการค้นหา?", "c": ["จำกัดผลการค้นหาให้แสดงเฉพาะข้อมูลจากเว็บไซต์ tistr.or.th เท่านั้น", "ทำให้ค้นหาได้ทุกเว็บไซต์พร้อมกันเร็วขึ้น", "เปลี่ยนภาษาของผลการค้นหาโดยอัตโนมัติ", "ลบเว็บไซต์นั้นออกจากผลการค้นหาทั้งหมด"], "a": 0, "exp": "คำสั่ง site:tistr.or.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะหน้าเว็บที่อยู่ในเว็บไซต์ tistr.or.th เท่านั้น", "lvl": "medium", "cat": "advanced"}, {"q": "ถ้าต้องการค้นหาไฟล์เอกสารประเภท ppt ที่เกี่ยวกับ \"การนำเสนอโครงงาน\" ควรใช้คำค้นแบบใด?", "c": ["การนำเสนอโครงงาน filetype:ppt", "การนำเสนอโครงงาน \"ppt\"", "การนำเสนอโครงงาน -ppt", "การนำเสนอโครงงาน OR ppt"], "a": 0, "exp": "คำสั่ง filetype:ppt ใช้จำกัดผลการค้นหาให้แสดงเฉพาะไฟล์ประเภท ppt ดังนั้นต้องพิมพ์ \"การนำเสนอโครงงาน filetype:ppt\"", "lvl": "medium", "cat": "advanced"}], [{"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่างเว็บเบราว์เซอร์กับเครื่องมือค้นหา?", "c": ["เบราว์เซอร์คือโปรแกรมที่ใช้เปิดเว็บไซต์ ส่วนเครื่องมือค้นหาคือเว็บไซต์หนึ่งที่ช่วยหาข้อมูล ซึ่งต้องเปิดผ่านเบราว์เซอร์อีกที", "ทั้งสองอย่างเป็นสิ่งเดียวกันใช้แทนกันได้เสมอ", "เครื่องมือค้นหาต้องติดตั้งลงเครื่องคอมพิวเตอร์ก่อนใช้งาน", "เบราว์เซอร์ใช้ได้เฉพาะบนโทรศัพท์มือถือเท่านั้น"], "a": 0, "exp": "เบราว์เซอร์คือโปรแกรมที่ใช้เปิดเว็บไซต์ ส่วนเครื่องมือค้นหาคือเว็บไซต์หนึ่งที่ช่วยหาข้อมูล ซึ่งต้องเปิดผ่านเบราว์เซอร์อีกที", "lvl": "hard", "cat": "browser"}, {"q": "การพิมพ์คำค้นว่า \"หมา OR แมว\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"หมา\" หรือ \"แมว\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"หมา\" และ \"แมว\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"แมว\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"หมา\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"หมา\" หรือ \"แมว\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "การเปิดใช้งาน \"โหมดไม่ระบุตัวตน\" (Incognito/Private Mode) ในเบราว์เซอร์มีประโยชน์อย่างไร?", "c": ["เบราว์เซอร์จะไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "ทำให้อินเทอร์เน็ตเร็วขึ้นกว่าปกติ", "ป้องกันไวรัสเข้าเครื่องคอมพิวเตอร์ทั้งหมด", "ทำให้ไม่มีใครในโลกสามารถเห็นการใช้งานได้เลย"], "a": 0, "exp": "โหมดไม่ระบุตัวตนจะไม่บันทึกประวัติการเข้าชมเว็บไซต์ในเครื่องหลังปิดหน้าต่างนั้น", "lvl": "hard", "cat": "browser"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"เครื่องคิดเลขธรรมดา\" กับ \"ระบบแนะนำสินค้าอัจฉริยะ\"?", "c": ["เครื่องคิดเลขธรรมดา ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ระบบแนะนำสินค้าอัจฉริยะ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "เครื่องคิดเลขธรรมดา และ ระบบแนะนำสินค้าอัจฉริยะ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ระบบแนะนำสินค้าอัจฉริยะ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "เครื่องคิดเลขธรรมดา ฉลาดกว่า ระบบแนะนำสินค้าอัจฉริยะ ในทุกด้านเสมอ"], "a": 0, "exp": "เครื่องคิดเลขธรรมดา เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ระบบแนะนำสินค้าอัจฉริยะ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}, {"q": "นักเรียนต้องการหาข้อมูลรายงานเรื่อง \"ภาวะโลกร้อน\" จากเว็บไซต์ราชการไทยเท่านั้น ควรพิมพ์คำค้นแบบใดจึงจะได้ผลลัพธ์ตรงความต้องการที่สุด?", "c": ["ภาวะโลกร้อน site:go.th", "ภาวะโลกร้อน -go.th", "\"ภาวะโลกร้อนไทย\"", "ภาวะโลกร้อน OR go.th"], "a": 0, "exp": "การใช้ site:go.th จะจำกัดผลลัพธ์ให้แสดงเฉพาะเว็บไซต์ราชการไทยที่ลงท้ายด้วย go.th", "lvl": "hard", "cat": "advanced"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"การบ้าน\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับการบ้านได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "ข้อใดคือคำค้นที่ \"มีประสิทธิภาพมากที่สุด\" สำหรับการหาวิธีทำการบ้านคณิตศาสตร์เรื่อง \"การหารเศษส่วน\" สำหรับนักเรียนชั้น ป.6?", "c": ["วิธีหารเศษส่วน ป.6", "คณิตศาสตร์", "เศษส่วน", "การบ้าน"], "a": 0, "exp": "คำค้นที่เจาะจงและมีรายละเอียดครบถ้วนอย่าง \"วิธีหารเศษส่วน ป.6\" จะให้ผลลัพธ์ที่ตรงความต้องการมากที่สุด", "lvl": "hard", "cat": "advanced"}, {"q": "การ \"นำภาพหรือข้อความของผู้อื่นมาใช้โดยไม่ขออนุญาตและไม่ให้เครดิต\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การละเมิดลิขสิทธิ์และทรัพย์สินทางปัญญา", "การละเมิดลิขสิทธิ์ทางความคิด (การลอกเลียนผลงาน)", "การกลั่นแกล้งทางไซเบอร์ (Cyberbullying)", "มารยาทที่ไม่เหมาะสม เพราะดูเหมือนกำลังตะโกนใส่ผู้อื่น"], "a": 0, "exp": "พฤติกรรม \"นำภาพหรือข้อความของผู้อื่นมาใช้โดยไม่ขออนุญาตและไม่ให้เครดิต\" จัดเป็นการละเมิดลิขสิทธิ์และทรัพย์สินทางปัญญา ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "เมื่อค้นหาด้วยคำกว้าง ๆ เช่น \"สัตว์\" แล้วได้ผลลัพธ์เยอะเกินไปและไม่ตรงประเด็น ควรทำอย่างไรเพื่อให้ได้ข้อมูลที่ตรงความต้องการมากขึ้น?", "c": ["เพิ่มคำค้นให้เจาะจงมากขึ้น เช่น ระบุชนิดสัตว์หรือสิ่งที่ต้องการรู้โดยเฉพาะ", "ลบคำค้นทั้งหมดแล้วค้นหาใหม่ด้วยคำเดิม", "เปลี่ยนไปใช้เครื่องมือค้นหาที่ช้าลง", "ปิดอินเทอร์เน็ตแล้วเปิดใหม่"], "a": 0, "exp": "การเพิ่มคำค้นให้เจาะจงมากขึ้นจะช่วยลดผลลัพธ์ที่ไม่เกี่ยวข้องและตรงความต้องการมากขึ้น", "lvl": "hard", "cat": "advanced"}, {"q": "การพิมพ์คำค้นว่า \"ส้ม OR มะนาว\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"ส้ม\" หรือ \"มะนาว\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"ส้ม\" และ \"มะนาว\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"มะนาว\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"ส้ม\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"ส้ม\" หรือ \"มะนาว\" ก็ได้", "lvl": "hard", "cat": "advanced"}], [{"q": "การใช้ \"ตัวกรองการค้นหาขั้นสูง\" (Advanced Search) เช่น กรองตามวันที่ ภาษา หรือประเภทไฟล์ มีประโยชน์อย่างไร?", "c": ["ช่วยจำกัดผลการค้นหาให้ตรงกับเงื่อนไขที่ต้องการมากขึ้น ลดผลลัพธ์ที่ไม่เกี่ยวข้อง", "ทำให้อินเทอร์เน็ตในเครื่องเร็วขึ้น", "ทำให้เว็บไซต์ทั้งหมดปลอดภัยขึ้นโดยอัตโนมัติ", "ทำให้ไม่ต้องพิมพ์คำค้นอีกต่อไป"], "a": 0, "exp": "ตัวกรองการค้นหาขั้นสูงช่วยจำกัดผลการค้นหาให้ตรงกับเงื่อนไขที่ต้องการมากขึ้น", "lvl": "hard", "cat": "advanced"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"นาฬิกาปลุกธรรมดา\" กับ \"ผู้ช่วยเสียงอัจฉริยะ\"?", "c": ["นาฬิกาปลุกธรรมดา ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ผู้ช่วยเสียงอัจฉริยะ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "นาฬิกาปลุกธรรมดา และ ผู้ช่วยเสียงอัจฉริยะ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ผู้ช่วยเสียงอัจฉริยะ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "นาฬิกาปลุกธรรมดา ฉลาดกว่า ผู้ช่วยเสียงอัจฉริยะ ในทุกด้านเสมอ"], "a": 0, "exp": "นาฬิกาปลุกธรรมดา เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ผู้ช่วยเสียงอัจฉริยะ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่างโปรแกรมคอมพิวเตอร์ทั่วไปกับ AI?", "c": ["โปรแกรมทั่วไปทำงานตามกฎที่ตั้งไว้ตายตัว ส่วน AI สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้", "โปรแกรมทั่วไปและ AI ทำงานเหมือนกันทุกประการไม่มีความแตกต่าง", "AI ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น ไม่สามารถใช้บนคอมพิวเตอร์ได้", "โปรแกรมทั่วไปฉลาดกว่า AI เสมอในทุกด้าน"], "a": 0, "exp": "โปรแกรมทั่วไปทำงานตามกฎที่ตั้งไว้ตายตัว ส่วน AI สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"ข่าวสารบ้านเมือง\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับข่าวสารบ้านเมืองได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอททุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลอื่นเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอ", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ จึงควรตรวจสอบจากแหล่งข้อมูลอื่นเพิ่มเติม", "lvl": "hard", "cat": "ai"}, {"q": "การ \"พิมพ์ข้อความตัวใหญ่ทั้งหมดในแชทเวลาคุยกับเพื่อน\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["มารยาทที่ไม่เหมาะสม เพราะดูเหมือนกำลังตะโกนใส่ผู้อื่น", "การเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม", "การละเมิดความเป็นส่วนตัวของผู้อื่น", "มารยาทที่ไม่เหมาะสม (สแปม/รบกวนผู้อื่น)"], "a": 0, "exp": "พฤติกรรม \"พิมพ์ข้อความตัวใหญ่ทั้งหมดในแชทเวลาคุยกับเพื่อน\" จัดเป็นมารยาทที่ไม่เหมาะสม เพราะดูเหมือนกำลังตะโกนใส่ผู้อื่น ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "เทคโนโลยี AI มีบทบาทอย่างไรกับรถยนต์ไร้คนขับ (Self-driving car)?", "c": ["ช่วยวิเคราะห์สภาพแวดล้อมรอบตัวรถแล้วตัดสินใจควบคุมรถได้เองโดยอัตโนมัติ", "ทำให้รถวิ่งได้เร็วกว่ารถทั่วไปเสมอ", "ทำให้รถไม่ต้องเติมน้ำมันหรือชาร์จไฟเลย", "ทำให้ราคารถยนต์ถูกลงกว่าเดิมทุกคัน"], "a": 0, "exp": "AI ช่วยวิเคราะห์สภาพแวดล้อมรอบตัวรถแล้วตัดสินใจควบคุมรถได้เองโดยอัตโนมัติ", "lvl": "hard", "cat": "ai"}, {"q": "การพิมพ์คำค้นว่า \"รถเมล์ OR รถไฟฟ้า\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"รถเมล์\" หรือ \"รถไฟฟ้า\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"รถเมล์\" และ \"รถไฟฟ้า\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"รถไฟฟ้า\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"รถเมล์\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"รถเมล์\" หรือ \"รถไฟฟ้า\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "การนำภาพหรือข้อความของผู้อื่นจากอินเทอร์เน็ตมาใช้โดยไม่ขออนุญาตและไม่ให้เครดิตเจ้าของ ถือเป็นการละเมิดสิ่งใด?", "c": ["ลิขสิทธิ์และทรัพย์สินทางปัญญาของผู้อื่น", "ความเร็วอินเทอร์เน็ตของเจ้าของผลงาน", "กฎการตั้งรหัสผ่าน", "การตั้งค่าเบราว์เซอร์"], "a": 0, "exp": "การกระทำนี้ถือเป็นการละเมิดลิขสิทธิ์และทรัพย์สินทางปัญญาของผู้อื่น", "lvl": "hard", "cat": "safety"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"เครื่องพิมพ์เอกสาร\" กับ \"แชทบอทตอบคำถามอัตโนมัติ\"?", "c": ["เครื่องพิมพ์เอกสาร ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน แชทบอทตอบคำถามอัตโนมัติ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "เครื่องพิมพ์เอกสาร และ แชทบอทตอบคำถามอัตโนมัติ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "แชทบอทตอบคำถามอัตโนมัติ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "เครื่องพิมพ์เอกสาร ฉลาดกว่า แชทบอทตอบคำถามอัตโนมัติ ในทุกด้านเสมอ"], "a": 0, "exp": "เครื่องพิมพ์เอกสาร เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ แชทบอทตอบคำถามอัตโนมัติ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}], [{"q": "ข้อใดเป็นวิธีตั้งค่าความเป็นส่วนตัว (Privacy Settings) ที่เหมาะสมบนโซเชียลมีเดียสำหรับเด็ก?", "c": ["จำกัดผู้ที่มองเห็นโพสต์และข้อมูลส่วนตัวเฉพาะคนที่รู้จักจริง ๆ", "เปิดให้ทุกคนในโลกมองเห็นข้อมูลส่วนตัวได้หมด", "ใส่ที่อยู่บ้านและเบอร์โทรในโปรไฟล์สาธารณะ", "ยอมรับคำขอเป็นเพื่อนจากทุกคนที่ส่งมาโดยไม่ตรวจสอบ"], "a": 0, "exp": "ควรจำกัดผู้ที่มองเห็นโพสต์และข้อมูลส่วนตัวเฉพาะคนที่รู้จักจริง ๆ", "lvl": "hard", "cat": "safety"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"สุขภาพ\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับสุขภาพได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดการไม่เปิดเผยข้อมูลส่วนตัว เช่น ชื่อโรงเรียน ที่อยู่ หรือเบอร์โทรศัพท์ ต่อคนแปลกหน้าทางออนไลน์จึงสำคัญ?", "c": ["เพื่อป้องกันไม่ให้คนไม่หวังดีนำข้อมูลไปใช้ในทางที่เป็นอันตรายต่อตัวเราหรือครอบครัว", "เพราะทำให้อินเทอร์เน็ตช้าลง", "เพราะเป็นกฎที่ไม่มีเหตุผลใด ๆ รองรับ", "เพราะทำให้เสียเวลาในการพิมพ์ข้อมูล"], "a": 0, "exp": "เพื่อป้องกันไม่ให้คนไม่หวังดีนำข้อมูลไปใช้ในทางที่เป็นอันตรายต่อตัวเราหรือครอบครัว", "lvl": "hard", "cat": "safety"}, {"q": "การ \"แชร์ข่าวที่ยังไม่ได้ตรวจสอบความถูกต้องต่อให้ผู้อื่น\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม", "การละเมิดลิขสิทธิ์และทรัพย์สินทางปัญญา", "มารยาทที่ไม่เหมาะสม (สแปม/รบกวนผู้อื่น)", "มารยาทที่ไม่เหมาะสม เพราะดูเหมือนกำลังตะโกนใส่ผู้อื่น"], "a": 0, "exp": "พฤติกรรม \"แชร์ข่าวที่ยังไม่ได้ตรวจสอบความถูกต้องต่อให้ผู้อื่น\" จัดเป็นการเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "การพิมพ์คำค้นว่า \"ฤดูร้อน OR ฤดูฝน\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"ฤดูร้อน\" หรือ \"ฤดูฝน\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"ฤดูร้อน\" และ \"ฤดูฝน\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"ฤดูฝน\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"ฤดูร้อน\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"ฤดูร้อน\" หรือ \"ฤดูฝน\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"รีโมททีวีธรรมดา\" กับ \"ระบบแนะนำวิดีโอที่ควรดูต่อ\"?", "c": ["รีโมททีวีธรรมดา ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ระบบแนะนำวิดีโอที่ควรดูต่อ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "รีโมททีวีธรรมดา และ ระบบแนะนำวิดีโอที่ควรดูต่อ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ระบบแนะนำวิดีโอที่ควรดูต่อ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "รีโมททีวีธรรมดา ฉลาดกว่า ระบบแนะนำวิดีโอที่ควรดูต่อ ในทุกด้านเสมอ"], "a": 0, "exp": "รีโมททีวีธรรมดา เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ระบบแนะนำวิดีโอที่ควรดูต่อ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"การเงิน\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับการเงินได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "การ \"คอมเมนต์ล้อเลียนรูปร่างหน้าตาของเพื่อนใต้โพสต์\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การกลั่นแกล้งทางไซเบอร์ (Cyberbullying)", "มารยาทที่ไม่เหมาะสมและอาจเข้าข่ายการกลั่นแกล้ง", "การเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม", "มารยาทที่ไม่เหมาะสม (สแปม/รบกวนผู้อื่น)"], "a": 0, "exp": "พฤติกรรม \"คอมเมนต์ล้อเลียนรูปร่างหน้าตาของเพื่อนใต้โพสต์\" จัดเป็นการกลั่นแกล้งทางไซเบอร์ (Cyberbullying) ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "การพิมพ์คำค้นว่า \"ฟุตบอล OR บาสเกตบอล\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"ฟุตบอล\" หรือ \"บาสเกตบอล\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"ฟุตบอล\" และ \"บาสเกตบอล\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"บาสเกตบอล\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"ฟุตบอล\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"ฟุตบอล\" หรือ \"บาสเกตบอล\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"โปรแกรมคำนวณตัวเลขทั่วไป\" กับ \"ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI\"?", "c": ["โปรแกรมคำนวณตัวเลขทั่วไป ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "โปรแกรมคำนวณตัวเลขทั่วไป และ ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "โปรแกรมคำนวณตัวเลขทั่วไป ฉลาดกว่า ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI ในทุกด้านเสมอ"], "a": 0, "exp": "โปรแกรมคำนวณตัวเลขทั่วไป เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ระบบวิเคราะห์แนวโน้มหุ้นด้วย AI ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}], [{"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"ประวัติศาสตร์\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับประวัติศาสตร์ได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "การ \"ตั้งบัญชีปลอมเพื่อว่าร้ายผู้อื่นในโลกออนไลน์\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การกลั่นแกล้งทางไซเบอร์ (Cyberbullying)", "การละเมิดความเป็นส่วนตัวของผู้อื่น", "การเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม", "มารยาทที่ไม่เหมาะสมและอาจเข้าข่ายการกลั่นแกล้ง"], "a": 0, "exp": "พฤติกรรม \"ตั้งบัญชีปลอมเพื่อว่าร้ายผู้อื่นในโลกออนไลน์\" จัดเป็นการกลั่นแกล้งทางไซเบอร์ (Cyberbullying) ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "การพิมพ์คำค้นว่า \"เพลงไทย OR เพลงสากล\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"เพลงไทย\" หรือ \"เพลงสากล\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"เพลงไทย\" และ \"เพลงสากล\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"เพลงสากล\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"เพลงไทย\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"เพลงไทย\" หรือ \"เพลงสากล\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"กล้องถ่ายภาพธรรมดา\" กับ \"ระบบจดจำใบหน้าอัตโนมัติ\"?", "c": ["กล้องถ่ายภาพธรรมดา ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ระบบจดจำใบหน้าอัตโนมัติ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "กล้องถ่ายภาพธรรมดา และ ระบบจดจำใบหน้าอัตโนมัติ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ระบบจดจำใบหน้าอัตโนมัติ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "กล้องถ่ายภาพธรรมดา ฉลาดกว่า ระบบจดจำใบหน้าอัตโนมัติ ในทุกด้านเสมอ"], "a": 0, "exp": "กล้องถ่ายภาพธรรมดา เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ระบบจดจำใบหน้าอัตโนมัติ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"วิทยาศาสตร์\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับวิทยาศาสตร์ได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "การ \"เผยแพร่รูปถ่ายของเพื่อนลงโซเชียลมีเดียโดยไม่ขออนุญาต\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การละเมิดความเป็นส่วนตัวของผู้อื่น", "การละเมิดลิขสิทธิ์ทางความคิด (การลอกเลียนผลงาน)", "การกลั่นแกล้งทางไซเบอร์ (Cyberbullying)", "มารยาทที่ไม่เหมาะสมและอาจเข้าข่ายการกลั่นแกล้ง"], "a": 0, "exp": "พฤติกรรม \"เผยแพร่รูปถ่ายของเพื่อนลงโซเชียลมีเดียโดยไม่ขออนุญาต\" จัดเป็นการละเมิดความเป็นส่วนตัวของผู้อื่น ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}, {"q": "การพิมพ์คำค้นว่า \"คณิตศาสตร์ OR วิทยาศาสตร์\" มีความหมายว่าอย่างไร?", "c": ["ค้นหาโดยแสดงผลลัพธ์ที่มีคำว่า \"คณิตศาสตร์\" หรือ \"วิทยาศาสตร์\" อย่างใดอย่างหนึ่งก็ได้", "ต้องมีทั้งคำว่า \"คณิตศาสตร์\" และ \"วิทยาศาสตร์\" ปรากฏพร้อมกันเท่านั้น", "ยกเว้นผลลัพธ์ที่มีคำว่า \"วิทยาศาสตร์\" ออกไปทั้งหมด", "ค้นหาเฉพาะคำว่า \"คณิตศาสตร์\" เพียงคำเดียวเท่านั้น"], "a": 0, "exp": "คำสั่ง OR (ตัวพิมพ์ใหญ่) ใช้เมื่อต้องการผลลัพธ์ที่มีคำใดคำหนึ่งจากสองคำ คือ \"คณิตศาสตร์\" หรือ \"วิทยาศาสตร์\" ก็ได้", "lvl": "hard", "cat": "advanced"}, {"q": "ข้อใดกล่าวถูกต้องเกี่ยวกับความแตกต่างระหว่าง \"พัดลมตั้งเวลาธรรมดา\" กับ \"ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้\"?", "c": ["พัดลมตั้งเวลาธรรมดา ทำงานตามคำสั่งที่ตั้งไว้ตายตัว ส่วน ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้ สามารถเรียนรู้จากข้อมูลและปรับปรุงการทำงานได้เอง", "พัดลมตั้งเวลาธรรมดา และ ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้ ทำงานเหมือนกันทุกประการ ไม่มีความแตกต่าง", "ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้ ทำงานได้เฉพาะบนโทรศัพท์มือถือเท่านั้น", "พัดลมตั้งเวลาธรรมดา ฉลาดกว่า ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้ ในทุกด้านเสมอ"], "a": 0, "exp": "พัดลมตั้งเวลาธรรมดา เป็นโปรแกรม/อุปกรณ์ทั่วไปที่ทำงานตามกฎตายตัว ในขณะที่ ระบบบ้านอัจฉริยะที่เรียนรู้พฤติกรรมผู้ใช้ ใช้ AI ที่เรียนรู้จากข้อมูลและพัฒนาตัวเองได้ตามเวลา", "lvl": "hard", "cat": "ai"}, {"q": "เพราะเหตุใดนักเรียนจึงไม่ควรเชื่อคำตอบจาก AI แชทบอทเกี่ยวกับเรื่อง \"กฎหมาย\" ทุกครั้งโดยไม่ตรวจสอบ?", "c": ["เพราะ AI อาจให้ข้อมูลที่ผิดพลาดหรือไม่เป็นปัจจุบันได้ ควรตรวจสอบจากแหล่งข้อมูลที่น่าเชื่อถือเพิ่มเติม", "เพราะ AI ทำงานช้ากว่ามนุษย์เสมอในทุกกรณี", "เพราะ AI ใช้งานได้เฉพาะภาษาอังกฤษเท่านั้น", "เพราะ AI ไม่สามารถตอบคำถามใด ๆ ได้เลย"], "a": 0, "exp": "แม้ AI จะช่วยตอบคำถามเกี่ยวกับกฎหมายได้สะดวก แต่ก็อาจให้ข้อมูลที่คลาดเคลื่อนหรือล้าสมัยได้ จึงควรตรวจสอบจากแหล่งอื่นเพิ่มเติมเสมอ", "lvl": "hard", "cat": "ai"}, {"q": "การ \"คัดลอกการบ้านของเพื่อนส่งเป็นผลงานของตัวเอง\" ถือเป็นพฤติกรรมแบบใดในการใช้อินเทอร์เน็ต?", "c": ["การละเมิดลิขสิทธิ์ทางความคิด (การลอกเลียนผลงาน)", "มารยาทที่ไม่เหมาะสมและอาจเข้าข่ายการกลั่นแกล้ง", "การเผยแพร่ข้อมูลที่อาจไม่ถูกต้องหรือข่าวปลอม", "มารยาทที่ไม่เหมาะสม (สแปม/รบกวนผู้อื่น)"], "a": 0, "exp": "พฤติกรรม \"คัดลอกการบ้านของเพื่อนส่งเป็นผลงานของตัวเอง\" จัดเป็นการละเมิดลิขสิทธิ์ทางความคิด (การลอกเลียนผลงาน) ซึ่งเป็นสิ่งที่ไม่ควรทำเมื่อใช้งานอินเทอร์เน็ต", "lvl": "hard", "cat": "safety"}]];
+
+let currentStudent = null;
+let currentLevel = 0;
+let currentQuestions = [];
+let currentQuestionIndex = 0;
+let userAnswers = [];
+
+window.onload = function() {
+  initSelects();
+  checkActiveStudent();
+};
+
+function initSelects() {
+  const roomSel = document.getElementById('room-select');
+  const numSel = document.getElementById('number-select');
+  ROOMS.forEach(r => {
+    let opt = document.createElement('option');
+    opt.value = r; opt.innerText = r;
+    roomSel.appendChild(opt);
+  });
+  for(let i=1; i<=MAX_NUMBER; i++) {
+    let opt = document.createElement('option');
+    opt.value = i; opt.innerText = `เลขที่ ${i}`;
+    numSel.appendChild(opt);
+  }
+}
+
+function refreshStudentStatus() {
+  const room = document.getElementById('room-select').value;
+  const num = document.getElementById('number-select').value;
+  const statusEl = document.getElementById('student-status');
+  const startBtn = document.getElementById('start-btn');
+  if (room && num) {
+    statusEl.innerText = `พร้อมทำข้อสอบ: ${room} เลขที่ ${num}`;
+    statusEl.classList.add('ready');
+    startBtn.disabled = false;
+  } else {
+    statusEl.innerText = 'กรุณาเลือกห้องและเลขที่ก่อนเริ่มทำข้อสอบ';
+    statusEl.classList.remove('ready');
+    startBtn.disabled = true;
+  }
+}
+
+function getStudentKey(room, num) {
+  const safeRoom = String(room).replace(/[^a-zA-Z0-9ก-๙]/g, '-');
+  return `${STORAGE_PREFIX}${safeRoom}_${num}`;
+}
+
+function safeParseJSON(raw, fallback) {
+  if (!raw) return fallback;
+  try { return JSON.parse(raw); }
+  catch (e) {
+    console.warn('พบข้อมูลที่บันทึกไว้เสียหาย ระบบจะเริ่มนับใหม่สำหรับคีย์นี้:', e);
+    return fallback;
+  }
+}
+
+function loadStudentState(room, num) {
+  const key = getStudentKey(room, num);
+  const data = localStorage.getItem(key);
+  const state = safeParseJSON(data, { unlockedLevel: 0, attempts: {} });
+  if (typeof state.unlockedLevel !== 'number') state.unlockedLevel = 0;
+  if (typeof state.attempts !== 'object' || state.attempts === null) state.attempts = {};
+  return state;
+}
+
+function saveStudentState(room, num, state) {
+  const key = getStudentKey(room, num);
+  localStorage.setItem(key, JSON.stringify(state));
+}
+
+function onStartBtnClick() {
+  const room = document.getElementById('room-select').value;
+  const num = document.getElementById('number-select').value;
+  if(!room || !num) return;
+  currentStudent = { room, num };
+  localStorage.setItem(ACTIVE_STUDENT_KEY, JSON.stringify(currentStudent));
+  showMapScreen();
+}
+
+function checkActiveStudent() {
+  const active = localStorage.getItem(ACTIVE_STUDENT_KEY);
+  const parsed = safeParseJSON(active, null);
+  if (parsed && parsed.room && parsed.num) {
+    currentStudent = parsed;
+    document.getElementById('room-select').value = currentStudent.room;
+    document.getElementById('number-select').value = currentStudent.num;
+    refreshStudentStatus();
+    showMapScreen();
+  } else if (active) {
+    localStorage.removeItem(ACTIVE_STUDENT_KEY);
+  }
+}
+
+function showScreen(id) {
+  ['start-screen', 'map-screen', 'quiz-screen', 'result-screen'].forEach(s => {
+    document.getElementById(s).classList.add('hidden');
+  });
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function goToStartScreen() {
+  localStorage.removeItem(ACTIVE_STUDENT_KEY);
+  currentStudent = null;
+  document.getElementById('room-select').value = "";
+  document.getElementById('number-select').value = "";
+  refreshStudentStatus();
+  showScreen('start-screen');
+}
+
+function showMapScreen() {
+  showScreen('map-screen');
+  const badgeText = `👤 ${currentStudent.room} เลขที่ ${currentStudent.num}`;
+  document.getElementById('map-student-badge').innerText = badgeText;
+
+  const state = loadStudentState(currentStudent.room, currentStudent.num);
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = '';
+
+  for (let i = 0; i < TOTAL_LEVELS; i++) {
+    const tile = document.createElement('div');
+    const isPassed = i < state.unlockedLevel;
+    const isCurrent = i === state.unlockedLevel;
+    const isLocked = i > state.unlockedLevel;
+
+    tile.className = `level-tile ${isPassed ? 'passed' : ''} ${isCurrent ? 'current' : ''} ${isLocked ? 'locked' : ''}`;
+
+    let icon = isPassed ? '✅' : isCurrent ? '⭐' : '🔒';
+    let label = isPassed ? 'ผ่านแล้ว' : isCurrent ? 'ด่านปัจจุบัน' : 'ยังไม่ปลดล็อก';
+    let attempts = state.attempts[i] ? `ทำไป ${state.attempts[i]} ครั้ง` : '';
+
+    tile.innerHTML = `
+      <span class="icon">${icon}</span>
+      <div class="num">${i + 1}</div>
+      <div class="label">${label}</div>
+      <div class="attempts">${attempts}</div>
+    `;
+
+    if (!isLocked) { tile.onclick = () => startLevel(i); }
+    grid.appendChild(tile);
+  }
+}
+
+function startLevel(lvlIndex) {
+  currentLevel = lvlIndex;
+  userAnswers = new Array(10).fill(null);
+  currentQuestionIndex = 0;
+
+  let rawQuestions = JSON.parse(JSON.stringify(LEVEL_DATA[lvlIndex] || LEVEL_DATA[0]));
+  currentQuestions = rawQuestions.sort(() => Math.random() - 0.5).map(q => {
+    let originalChoices = [...q.c];
+    let correctAnswerText = originalChoices[q.a];
+    let shuffledChoices = originalChoices.sort(() => Math.random() - 0.5);
+    let newCorrectIndex = shuffledChoices.indexOf(correctAnswerText);
+    return { ...q, c: shuffledChoices, a: newCorrectIndex };
+  });
+
+  showScreen('quiz-screen');
+  document.getElementById('active-student-badge').innerText = `👤 ${currentStudent.room} เลขที่ ${currentStudent.num}`;
+  document.getElementById('level-num-live').innerText = currentLevel + 1;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = currentQuestions[currentQuestionIndex];
+  document.getElementById('q-index').innerText = currentQuestionIndex + 1;
+  document.getElementById('q-text').innerText = q.q;
+
+  const pill = document.getElementById('cat-pill');
+  const catInfo = CAT[q.cat] || CAT.browser;
+  pill.textContent = catInfo.label;
+  pill.className = 'category-pill ' + catInfo.pill;
+
+  const lvlPill = document.getElementById('level-pill');
+  const lvlInfo = LEVEL_LABEL[q.lvl] || LEVEL_LABEL.easy;
+  lvlPill.querySelector('.level-text').textContent = lvlInfo.label;
+  lvlPill.querySelector('.dot').style.background = lvlInfo.color;
+
+  const hintPanel = document.getElementById('hint-panel');
+  hintPanel.innerText = HINTS[q.cat] || HINTS.browser;
+  hintPanel.classList.add('hidden');
+
+  const progressPath = document.getElementById('progress-path');
+  progressPath.innerHTML = '';
+  for(let i=0; i<10; i++) {
+    let node = document.createElement('div');
+    node.className = `node ${i === currentQuestionIndex ? 'current' : ''} ${userAnswers[i] !== null ? 'answered' : ''}`;
+    progressPath.appendChild(node);
+  }
+
+  const choicesEl = document.getElementById('choices');
+  choicesEl.innerHTML = '';
+  const letters = ['ก', 'ข', 'ค', 'ง'];
+  q.c.forEach((choiceText, index) => {
+    const btn = document.createElement('button');
+    btn.className = `choice-btn ${userAnswers[currentQuestionIndex] === index ? 'selected' : ''}`;
+    btn.innerHTML = `<span class="letter">${letters[index]}</span> <span>${choiceText}</span>`;
+    btn.onclick = () => selectChoice(index);
+    choicesEl.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  if(userAnswers[currentQuestionIndex] !== null) { nextBtn.classList.add('show'); }
+  else { nextBtn.classList.remove('show'); }
+}
+
+function selectChoice(index) {
+  userAnswers[currentQuestionIndex] = index;
+  renderQuestion();
+}
+
+function toggleHint() {
+  document.getElementById('hint-panel').classList.toggle('hidden');
+}
+
+function nextQuestion() {
+  if (currentQuestionIndex < 9) { currentQuestionIndex++; renderQuestion(); }
+  else { finishLevel(); }
+}
+
+function confirmBackToMap() {
+  if (confirm("ต้องการกลับไปที่แผนที่ด่านหรือไม่? (คำตอบในรอบนี้จะไม่ถูกบันทึก)")) {
+    showMapScreen();
+  }
+}
+
+function finishLevel() {
+  showScreen('result-screen');
+  document.getElementById('result-student-badge').innerText = `👤 ${currentStudent.room} เลขที่ ${currentStudent.num}`;
+  document.getElementById('result-level-num').innerText = currentLevel + 1;
+
+  let score = 0;
+  currentQuestions.forEach((q, idx) => { if (userAnswers[idx] === q.a) score++; });
+  document.getElementById('final-score').innerText = score;
+
+  const state = loadStudentState(currentStudent.room, currentStudent.num);
+  state.attempts[currentLevel] = (state.attempts[currentLevel] || 0) + 1;
+
+  const isPass = score === 10;
+  const heroEl = document.getElementById('result-hero');
+  const verdictBanner = document.getElementById('verdict-banner');
+  const reviewList = document.getElementById('review-list');
+  const actionRow = document.getElementById('result-actions');
+  reviewList.innerHTML = '';
+
+  if (isPass) {
+    heroEl.className = 'result-hero is-pass';
+    verdictBanner.className = 'verdict-banner pass';
+    document.getElementById('verdict-title').innerText = '🎉 ยินดีด้วย! คุณผ่านด่านนี้แล้ว';
+    document.getElementById('verdict-sub').innerText = 'คุณตอบถูกต้องครบ 10/10 ข้อ ปลดล็อกด่านถัดไปเรียบร้อยแล้ว!';
+
+    if (currentLevel === state.unlockedLevel && state.unlockedLevel < TOTAL_LEVELS) {
+      state.unlockedLevel++;
+    }
+
+    currentQuestions.forEach((q, idx) => {
+      let item = document.createElement('div');
+      item.className = 'review-item';
+      item.innerHTML = `
+        <div class="rq"><b>ข้อที่ ${idx + 1} [${CAT[q.cat] ? CAT[q.cat].label : ''}]:</b> ${q.q}</div>
+        <div class="ra">✅ คำตอบที่ถูกต้อง: ${q.c[q.a]}</div>
+        <div class="exp"><b class="exp-title">คำอธิบาย:</b>${q.exp}</div>
+      `;
+      reviewList.appendChild(item);
+    });
+
+    actionRow.innerHTML = `
+      <button class="ghost-btn" onclick="showMapScreen()">🗺️ แผนที่ด่าน</button>
+      ${currentLevel < TOTAL_LEVELS - 1 ? `<button class="primary-action-btn" onclick="startLevel(${currentLevel + 1})">ไปด่านถัดไป ➔</button>` : ''}
+    `;
+  } else {
+    heroEl.className = 'result-hero is-fail';
+    verdictBanner.className = 'verdict-banner fail';
+    document.getElementById('verdict-title').innerText = '❌ ยังไม่ผ่านด่าน';
+    document.getElementById('verdict-sub').innerText = 'ต้องตอบถูกให้ครบ 10/10 ข้อเท่านั้นจึงจะผ่านด่าน ลองใหม่อีกครั้งนะ!';
+
+    actionRow.innerHTML = `
+      <button class="ghost-btn" onclick="showMapScreen()">🗺️ แผนที่ด่าน</button>
+      <button class="primary-action-btn" onclick="startLevel(${currentLevel})">🔄 ลองทำใหม่อีกครั้ง</button>
+    `;
+  }
+
+  saveStudentState(currentStudent.room, currentStudent.num, state);
+}
+
+function teacherReset() {
+  const pin = prompt("กรุณากรอก PIN สำหรับคุณครูเพื่อรีเซ็ตความคืบหน้า:");
+  if (pin === TEACHER_RESET_PIN) {
+    if (confirm(`คุณต้องการรีเซ็ตความคืบหน้าของ ${currentStudent.room} เลขที่ ${currentStudent.num} ใช่หรือไม่?`)) {
+      saveStudentState(currentStudent.room, currentStudent.num, { unlockedLevel: 0, attempts: {} });
+      alert("รีเซ็ตความคืบหน้าเรียบร้อยแล้ว");
+      showMapScreen();
+    }
+  } else if (pin !== null) {
+    alert("รหัส PIN ไม่ถูกต้อง");
+  }
+}
+</script>
+</body>
+</html>
